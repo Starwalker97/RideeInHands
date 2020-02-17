@@ -110,9 +110,7 @@ public class MainFragment extends Fragment {
 //                }
 //            } catch (Resources.NotFoundException e) {
 //            }
-                // TODO: Before enabling the My Location layer, you must request
-                // location permission from the user. This sample does not include
-                // a request for location permission.
+
                 mMap.setMyLocationEnabled(true);
 
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
