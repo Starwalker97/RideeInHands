@@ -1,11 +1,12 @@
 package com.example.rideeinhands;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
@@ -14,21 +15,21 @@ import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClic
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
-import java.time.Month;
 import java.util.Calendar;
 import java.util.TimeZone;
 
 public class CreateTripActivity extends AppCompatActivity {
 
     MaterialEditText tripName, tripDetail, tripDate, tripTime;
-    TimePickerDialog timePickerDialog;
-
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_trip);
-
-
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Create Trip");
 
         tripName = findViewById(R.id.tripName);
         tripDate = findViewById(R.id.tripDate);
@@ -60,6 +61,14 @@ public class CreateTripActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 setTime();
+            }
+        });
+
+        findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CreateTripActivity.this, SelectLocation.class);
+                startActivity(intent);
             }
         });
 
