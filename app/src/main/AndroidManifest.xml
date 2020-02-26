@@ -18,7 +18,11 @@
         android:roundIcon="@drawable/app_logo_circle"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TripDetailActivity"></activity>
+        <activity
+            android:name=".TripDetailActivity"
+            android:parentActivityName=".MainActivity">
+
+        </activity>
         <activity
             android:name=".SelectLocation"
             android:parentActivityName=".CreateTripActivity"></activity>

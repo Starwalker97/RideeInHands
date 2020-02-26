@@ -462,7 +462,7 @@ public class SelectLocation extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            routeString = routes.toString();
+            routeString = jsonData[0];
 
             return routes;
         }
