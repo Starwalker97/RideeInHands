@@ -8,6 +8,11 @@
         android:title="My Account"
         android:icon="@drawable/ic_account_box_black_24dp"
         />
+    <item
+        android:id="@+id/activeTrips"
+        android:icon="@drawable/ic_location_on_black_24dp"
+        android:title="Active Trips" />
+
     <item android:id="@+id/log_out"
         android:title="Log Out"
         android:icon="@drawable/exit"/>

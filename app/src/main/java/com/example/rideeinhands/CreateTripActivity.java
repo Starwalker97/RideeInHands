@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -20,7 +21,7 @@ import java.util.TimeZone;
 
 public class CreateTripActivity extends AppCompatActivity {
 
-    MaterialEditText tripName, tripDetail, tripDate, tripTime;
+    MaterialEditText tripName, tripDetail, tripDate, tripTime, no_of_passengers;
     Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class CreateTripActivity extends AppCompatActivity {
         tripDate = findViewById(R.id.tripDate);
         tripDetail = findViewById(R.id.tripDetails);
         tripTime = findViewById(R.id.tripTime);
+        no_of_passengers = findViewById(R.id.no_of_passengers);
 
         tripDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -67,8 +69,21 @@ public class CreateTripActivity extends AppCompatActivity {
         findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CreateTripActivity.this, SelectLocation.class);
-                startActivity(intent);
+
+                if ((!tripTime.getText().toString().isEmpty()) && (!tripDetail.getText().toString().isEmpty())
+                        && (!tripDate.getText().toString().isEmpty()) && (!tripName.getText().toString().isEmpty())
+                        && (!no_of_passengers.getText().toString().isEmpty())) {
+
+                    Intent intent = new Intent(CreateTripActivity.this, SelectLocation.class);
+                    intent.putExtra("tripName", tripName.getText().toString());
+                    intent.putExtra("tripDetail", tripDetail.getText().toString());
+                    intent.putExtra("tripDate", tripDate.getText().toString());
+                    intent.putExtra("tripTime", tripTime.getText().toString());
+                    intent.putExtra("no_of_passengers", no_of_passengers.getText().toString());
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(CreateTripActivity.this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

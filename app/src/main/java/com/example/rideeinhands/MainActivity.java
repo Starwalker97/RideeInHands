@@ -18,8 +18,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.rideeinhands.fragments.MainFragment;
 import com.example.rideeinhands.fragments.MyAccountFragment;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.rideeinhands.fragments.MyTripsFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -49,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -59,6 +59,14 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
         actionBarDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
+
+        String fragToLoad = getIntent().getStringExtra("fragToLoad");
+        if (fragToLoad != null) {
+            if (fragToLoad.equals("ActiveTrips")) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyTripsFragment()).commit();
+
+            }
+        }
 
         DocumentReference documentReference = db.collection("Users")
                 .document(firebaseAuth.getCurrentUser().getUid());
@@ -91,6 +99,13 @@ public class MainActivity extends AppCompatActivity {
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyAccountFragment()).commit();
                         break;
+
+                    case R.id.activeTrips:
+                        drawerLayout.closeDrawer(GravityCompat.START, false);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyTripsFragment()).commit();
+                        break;
+
+
                     case R.id.log_out:
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);

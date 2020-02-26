@@ -1,16 +1,15 @@
 package com.example.rideeinhands;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.WindowManager;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 public class SplashScreenActivity extends AppCompatActivity {
-
     FirebaseAuth firebaseAuth;
 
     @Override
@@ -21,13 +20,15 @@ public class SplashScreenActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                //for new user if token is not available e.g. cookies
                 if (firebaseAuth.getCurrentUser()==null) {
-                    final Intent mainIntent = new Intent(SplashScreenActivity.this, LoginActivity.class);
+                    Intent mainIntent = new Intent(SplashScreenActivity.this, LoginActivity.class);
                     SplashScreenActivity.this.startActivity(mainIntent);
                     SplashScreenActivity.this.finish();
                 }
+                //for an existing login
                 else {
-                    final Intent mainIntent = new Intent(SplashScreenActivity.this, MainActivity.class);
+                    Intent mainIntent = new Intent(SplashScreenActivity.this, MainActivity.class);
                     SplashScreenActivity.this.startActivity(mainIntent);
                     SplashScreenActivity.this.finish();
                 }

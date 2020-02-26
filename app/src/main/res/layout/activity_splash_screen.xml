@@ -6,15 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".SplashScreenActivity"
     android:background="@drawable/background_gradient">
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="500dp"
         android:src="@drawable/app_logo"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.github.ybq.android.spinkit.SpinKitView
         android:id="@+id/loading"

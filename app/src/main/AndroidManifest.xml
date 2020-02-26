@@ -18,9 +18,10 @@
         android:roundIcon="@drawable/app_logo_circle"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SelectLocation">
-
-        </activity>
+        <activity android:name=".TripDetailActivity"></activity>
+        <activity
+            android:name=".SelectLocation"
+            android:parentActivityName=".CreateTripActivity"></activity>
         <activity
             android:name=".CreateTripActivity"
             android:parentActivityName=".MainActivity"></activity>
@@ -41,9 +42,7 @@
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
         <activity android:name=".ForgotPasswordActivity" />
-        <activity android:name=".MainActivity">
-
-        </activity>
+        <activity android:name=".MainActivity"></activity>
         <activity android:name=".PickPasswordActivity" />
         <activity android:name=".PictureActivity" />
         <activity android:name=".RegisterActivity" />
