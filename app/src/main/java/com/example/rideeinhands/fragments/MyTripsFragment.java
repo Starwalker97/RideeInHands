@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rideeinhands.R;
 import com.example.rideeinhands.TripDetailActivity;
-import com.example.rideeinhands.models.ActiveTripsModel;
+import com.example.rideeinhands.models.TripModel;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,8 +31,8 @@ public class MyTripsFragment extends Fragment {
     RecyclerView recyclerView;
     FirebaseFirestore firebaseFirestore;
     FirebaseAuth firebaseAuth;
-    public static ArrayList<ActiveTripsModel> activetripsList;
-    FirestoreRecyclerAdapter<ActiveTripsModel, TripsViewHolder> firestoreRecyclerAdapter;
+    public static ArrayList<TripModel> activetripsList;
+    FirestoreRecyclerAdapter<TripModel, TripsViewHolder> firestoreRecyclerAdapter;
 
     public MyTripsFragment() {
     }
@@ -64,17 +64,17 @@ public class MyTripsFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         Query query = firebaseFirestore.collection("Trips").document(firebaseAuth.getCurrentUser().getUid())
                 .collection("Pending");
-        FirestoreRecyclerOptions<ActiveTripsModel> options = new FirestoreRecyclerOptions.Builder<ActiveTripsModel>()
-                .setQuery(query, ActiveTripsModel.class)
+        FirestoreRecyclerOptions<TripModel> options = new FirestoreRecyclerOptions.Builder<TripModel>()
+                .setQuery(query, TripModel.class)
                 .build();
 
-        firestoreRecyclerAdapter = new FirestoreRecyclerAdapter<ActiveTripsModel, TripsViewHolder>(options) {
+        firestoreRecyclerAdapter = new FirestoreRecyclerAdapter<TripModel, TripsViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull TripsViewHolder tripsViewHolder, int i, @NonNull ActiveTripsModel activeTripsModel) {
-                tripsViewHolder.setName(activeTripsModel.getName());
-                tripsViewHolder.setDate(activeTripsModel.getDate());
-                tripsViewHolder.setDestination(activeTripsModel.getDestination());
-                activetripsList.add(activeTripsModel);
+            protected void onBindViewHolder(@NonNull TripsViewHolder tripsViewHolder, int i, @NonNull TripModel tripModel) {
+                tripsViewHolder.setName(tripModel.getName());
+                tripsViewHolder.setDate(tripModel.getDate());
+                tripsViewHolder.setDestination(tripModel.getDestination());
+                activetripsList.add(tripModel);
 
             }
 

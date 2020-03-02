@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.rideeinhands.models.TripModel;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -45,7 +46,9 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONObject;
 
@@ -70,12 +73,14 @@ public class SelectLocation extends AppCompatActivity {
     LatLng startingPointLoc, destinationPointLoc;
     GoogleMap mMap;
     String tripName, tripDetail, tripDate, tripTime, no_of_passengers;
-    private FusedLocationProviderClient fusedLocationProviderClient;
     Toolbar toolbar;
     FirebaseFirestore firebaseFirestore;
     FirebaseAuth firebaseAuth;
+    public static ArrayList<TripModel> tripsList;
     Map<String, String> hashMap;
     String routeString;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +89,8 @@ public class SelectLocation extends AppCompatActivity {
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         hashMap = new HashMap<>();
+
+        String whichActivity = getIntent().getStringExtra("whichActivity");
 
         tripName = getIntent().getStringExtra("tripName");
         tripDate = getIntent().getStringExtra("tripDate");
@@ -112,47 +119,104 @@ public class SelectLocation extends AppCompatActivity {
         findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hashMap.put("Name", tripName);
-                hashMap.put("Detail", tripDetail);
-                hashMap.put("Date", tripDate);
-                hashMap.put("Time", tripTime);
-                hashMap.put("Number of Passengers", no_of_passengers);
-                hashMap.put("Start", startingPoint.getText().toString());
-                hashMap.put("Destination", destinationPoint.getText().toString());
-                hashMap.put("StartLocation", startingPointLoc.latitude + "," + startingPointLoc.longitude);
-                hashMap.put("DestinationLocation", destinationPointLoc.latitude + "," + destinationPointLoc.longitude);
-                hashMap.put("Route", routeString);
+                if (whichActivity.equals("CreateTrip")) {
+                    hashMap.put("Name", tripName);
+                    hashMap.put("Detail", tripDetail);
+                    hashMap.put("Date", tripDate);
+                    hashMap.put("Time", tripTime);
+                    hashMap.put("Number of Passengers", no_of_passengers);
+                    hashMap.put("Start", startingPoint.getText().toString());
+                    hashMap.put("Destination", destinationPoint.getText().toString());
+                    hashMap.put("StartLocation", startingPointLoc.latitude + "," + startingPointLoc.longitude);
+                    hashMap.put("DestinationLocation", destinationPointLoc.latitude + "," + destinationPointLoc.longitude);
+                    hashMap.put("Route", routeString);
 
+                    HashMap<String, String> enabled = new HashMap<>();
+                    enabled.put("enabled", "true");
 
-                CollectionReference collectionReference = firebaseFirestore.collection("Trips")
-                        .document(firebaseAuth.getCurrentUser().getUid())
-                        .collection("Pending");
-                collectionReference.document(collectionReference.document().getId()).set(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(SelectLocation.this, "Trip Created", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                            intent.putExtra("fragtoLoad", "ActiveTrips");
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(SelectLocation.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    CollectionReference collectionReference = firebaseFirestore.collection("Trips")
+                            .document(firebaseAuth.getCurrentUser().getUid())
+                            .collection("Pending");
+                    collectionReference.document(collectionReference.document().getId()).set(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                firebaseFirestore.collection("Trips").document(firebaseAuth.getCurrentUser().getUid())
+                                        .set(enabled);
+                                Toast.makeText(SelectLocation.this, "Trip Created", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                                intent.putExtra("fragtoLoad", "ActiveTrips");
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(SelectLocation.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(SelectLocation.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(SelectLocation.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnCanceledListener(new OnCanceledListener() {
+                                @Override
+                                public void onCanceled() {
+                                    Toast.makeText(SelectLocation.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                } else if (whichActivity.equals("GetARide")) {
+                    tripsList = new ArrayList<>();
+                    CollectionReference collectionReference = firebaseFirestore.collection("Trips");
+                    collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                    CollectionReference collectionReference1 = firebaseFirestore
+                                            .collection("Trips")
+                                            .document(documentSnapshot.getId())
+                                            .collection("Pending");
+                                    collectionReference1.
+                                            whereEqualTo("Destination", "Lahore Lahore, Punjab, Pakistan")
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        for (int i = 0; i < task.getResult().size(); i++) {
+                                                            DocumentSnapshot documentSnapshot1
+                                                                    = task.getResult().getDocuments()
+                                                                    .get(i);
+                                                            tripsList.add(
+                                                                    new TripModel(
+                                                                            documentSnapshot1.getString("Name")
+                                                                            , documentSnapshot1.getString("Detail")
+                                                                            , documentSnapshot1.getString("Start")
+                                                                            , documentSnapshot1.getString("Destination")
+                                                                            , documentSnapshot1.getString("StartLocation")
+                                                                            , documentSnapshot1.getString("DestinationLocation")
+                                                                            , documentSnapshot1.getString("Date")
+                                                                            , documentSnapshot1.getString("Time")
+                                                                            , documentSnapshot1.getString("Route")
+                                                                    )
+                                                            );
+                                                        }
+
+                                                        Intent intent = new Intent(SelectLocation.this, AvailableTrips.class);
+                                                        startActivity(intent);
+
+                                                    }
+                                                }
+                                            });
+
+                                }
                             }
-                        })
-                        .addOnCanceledListener(new OnCanceledListener() {
-                            @Override
-                            public void onCanceled() {
-                                Toast.makeText(SelectLocation.this, "Cancelled", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        }
+                    });
+
+                }
+
             }
         });
 

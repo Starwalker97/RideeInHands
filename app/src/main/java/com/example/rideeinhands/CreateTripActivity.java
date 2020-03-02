@@ -75,6 +75,7 @@ public class CreateTripActivity extends AppCompatActivity {
                         && (!no_of_passengers.getText().toString().isEmpty())) {
 
                     Intent intent = new Intent(CreateTripActivity.this, SelectLocation.class);
+                    intent.putExtra("whichActivity", "CreateTrip");
                     intent.putExtra("tripName", tripName.getText().toString());
                     intent.putExtra("tripDetail", tripDetail.getText().toString());
                     intent.putExtra("tripDate", tripDate.getText().toString());

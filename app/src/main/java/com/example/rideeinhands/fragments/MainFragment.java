@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.rideeinhands.CreateTripActivity;
+import com.example.rideeinhands.GetARideActivity;
 import com.example.rideeinhands.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -66,6 +67,13 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), CreateTripActivity.class);
+                startActivity(intent);
+            }
+        });
+        view.findViewById(R.id.take_a_ride_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), GetARideActivity.class);
                 startActivity(intent);
             }
         });

@@ -40,10 +40,12 @@ public class LoginActivity extends AppCompatActivity {
         textView2 = findViewById(R.id.textView2);
         textView3 =findViewById(R.id.textView3);
 
+
         findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 progressDialog.show();
+
                 firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -66,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                                 }
                                                 else {
+                                                    progressDialog.dismiss();
                                                     Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                                 }
                                             }

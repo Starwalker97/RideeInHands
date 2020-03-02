@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GetARideActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:theme="@android:style/Theme.Holo.Light.DarkActionBar"
+        app:title="Select Time and Date"
+        app:titleTextColor="@android:color/white"
+
+        />
+
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/tripDate"
+        android:layout_width="225dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:editable="false"
+        android:hint="Trip Date"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/tripTime"
+        android:layout_width="225dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:editable="false"
+        android:hint="Trip Time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tripDate" />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/no_of_passengers"
+        android:layout_width="225dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:hint="No. of passengers"
+        android:inputType="number"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tripTime" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/submit"
+        android:layout_width="225dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        android:text="Next"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/no_of_passengers" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

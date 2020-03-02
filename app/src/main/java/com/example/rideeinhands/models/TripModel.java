@@ -1,6 +1,6 @@
 package com.example.rideeinhands.models;
 
-public class ActiveTripsModel {
+public class TripModel {
 
     String Name;
     String Detail;
@@ -12,10 +12,10 @@ public class ActiveTripsModel {
     String Time;
     String Route;
 
-    public ActiveTripsModel() {
+    public TripModel() {
     }
 
-    public ActiveTripsModel(String name, String detail, String start, String destination, String startLocation, String destinationLocation, String date, String time, String route) {
+    public TripModel(String name, String detail, String start, String destination, String startLocation, String destinationLocation, String date, String time, String route) {
         Name = name;
         Detail = detail;
         Start = start;

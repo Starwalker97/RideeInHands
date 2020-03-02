@@ -3,6 +3,7 @@ package com.example.rideeinhands;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.rideeinhands.fragments.MyTripsFragment;
-import com.example.rideeinhands.models.ActiveTripsModel;
+import com.example.rideeinhands.models.TripModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -41,7 +42,7 @@ public class TripDetailActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     TextView tripName, tripDetail, startingPoint, destinationPoint, dateTime;
-    ActiveTripsModel activeTrip;
+    TripModel activeTrip;
     GoogleMap mMap;
     List<String> startinglatlng, endinglatlng;
     List<List<HashMap<String, String>>> routes;
@@ -75,6 +76,7 @@ public class TripDetailActivity extends AppCompatActivity {
                 collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        Log.d("TAG", queryDocumentSnapshots.size() + "");
                         AlertDialog.Builder builder = new AlertDialog.Builder(TripDetailActivity.this);
                         builder.setTitle("Confirmation")
                                 .setMessage("Are you sure you want to delete this trip?")
