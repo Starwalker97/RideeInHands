@@ -96,6 +96,7 @@ public class PickPasswordActivity extends AppCompatActivity {
                                                                     }).addOnFailureListener(new OnFailureListener() {
                                                                 @Override
                                                                 public void onFailure(@NonNull Exception e) {
+                                                                    progressDialog.dismiss();
                                                                     Toast.makeText(PickPasswordActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
                                                                 }
                                                             });
@@ -106,24 +107,26 @@ public class PickPasswordActivity extends AppCompatActivity {
                                             });
                                         }
                                         else {
+                                            progressDialog.dismiss();
                                             Toast.makeText(PickPasswordActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                         }
-
-
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                progressDialog.dismiss();
                                 Toast.makeText(PickPasswordActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
                     else {
+                        progressDialog.dismiss();
                         Toast.makeText(PickPasswordActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
                     }
 
                 }
                 else {
+                    progressDialog.dismiss();
                     Toast.makeText(PickPasswordActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
                 }
 
@@ -154,6 +157,7 @@ public class PickPasswordActivity extends AppCompatActivity {
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
+                    progressDialog.dismiss();
                     Toast.makeText(PickPasswordActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }

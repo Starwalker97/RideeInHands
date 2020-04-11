@@ -1,6 +1,7 @@
 package com.example.rideeinhands;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -25,7 +27,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -35,6 +41,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,13 +49,15 @@ public class TripDetailActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     TextView tripName, tripDetail, startingPoint, destinationPoint, dateTime;
-    TripModel activeTrip;
+    public static TripModel activeTrip;
     GoogleMap mMap;
     List<String> startinglatlng, endinglatlng;
     List<List<HashMap<String, String>>> routes;
     ImageView del;
     FirebaseFirestore firebaseFirestore;
     private JSONObject jObject;
+    String whichActivity;
+    ExtendedFloatingActionButton reqsBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +70,10 @@ public class TripDetailActivity extends AppCompatActivity {
         tripDetail = findViewById(R.id.tripDetails);
         startingPoint = findViewById(R.id.starting_point);
         destinationPoint = findViewById(R.id.destination_point);
+        reqsBtn = findViewById(R.id.reqs);
         dateTime = findViewById(R.id.dateTime);
         del = findViewById(R.id.del);
+        whichActivity = getIntent().getStringExtra("whichActivity");
         firebaseFirestore = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = firebaseFirestore.collection("Trips")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -109,7 +120,66 @@ public class TripDetailActivity extends AppCompatActivity {
             }
         });
 
-        activeTrip = MyTripsFragment.activetripsList.get(itemPosition);
+        try {
+            if (whichActivity.equals("AvailableTrips")) {
+                activeTrip = AvailableTrips.tripsList.get(itemPosition);
+                del.setVisibility(View.GONE);
+                reqsBtn.setText("Request Trip");
+                reqsBtn.setIcon(getDrawable(R.drawable.ic_near_me_black_24dp));
+            } else {
+                activeTrip = MyTripsFragment.activetripsList.get(itemPosition);
+                reqsBtn.setText("See Requests");
+            }
+        } catch (NullPointerException ex) {
+            activeTrip = MyTripsFragment.activetripsList.get(itemPosition);
+            reqsBtn.setText("See Requests");
+        }
+
+
+        reqsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (reqsBtn.getText().toString().equals("Request Trip")) {
+                    String currentdate = Calendar.getInstance().getTime().toString();
+                    HashMap<String, String> map = new HashMap<>();
+                    map.put("Status", "Requested");
+                    map.put("DateTime", currentdate);
+                    map.put("PickUpPoint", getIntent().getStringExtra("PickupPoint"));
+                    reqsBtn.setEnabled(false);
+                    firebaseFirestore.collection("Trips")
+                            .document(activeTrip.getUserId())
+                            .collection("Pending")
+                            .document(activeTrip.getTripId())
+                            .collection("Requests")
+                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .set(map)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        reqsBtn.setText("Cancel Request");
+                                        reqsBtn.setEnabled(true);
+                                        reqsBtn.setTextColor(Color.WHITE);
+                                        reqsBtn.setBackgroundColor(getColor(R.color.colorPrimary));
+                                        reqsBtn.setIcon(getDrawable(R.drawable.ic_clear_white_24dp));
+                                    } else {
+                                        Toast.makeText(TripDetailActivity.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(TripDetailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                } else if (reqsBtn.getText().toString().equals("See Requests")) {
+                    Intent intent = new Intent(TripDetailActivity.this, RequestsActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
 
         tripName.setText(activeTrip.getName());
         tripDetail.setText(activeTrip.getDetail());

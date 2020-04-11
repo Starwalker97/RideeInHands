@@ -11,6 +11,8 @@ public class TripModel {
     String Date;
     String Time;
     String Route;
+    String userId;
+    String tripId;
 
     public TripModel() {
     }
@@ -25,6 +27,22 @@ public class TripModel {
         Date = date;
         Time = time;
         Route = route;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getTripId() {
+        return tripId;
+    }
+
+    public void setTripId(String tripId) {
+        this.tripId = tripId;
     }
 
     public String getName() {

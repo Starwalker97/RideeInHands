@@ -7,4 +7,6 @@
     <color name="circleBorder">#50FFFFFF</color>
     <color name="mdtp_accent_color">#009688</color>
     <color name="mdtp_accent_color_dark">#00796b</color>
+    <color name="accept_green">#4CAF50</color>
+    <color name="reject_red">#F44336</color>
 </resources>

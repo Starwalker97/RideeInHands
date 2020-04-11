@@ -3,22 +3,19 @@ package com.example.rideeinhands.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.example.rideeinhands.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -111,7 +108,6 @@ public class MyAccountFragment extends Fragment {
         });
 
 
-
         userImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,7 +125,8 @@ public class MyAccountFragment extends Fragment {
         CropImage.startPickImageActivity(getContext(),this);
 
     }
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
             if (mCropImageUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // required permissions granted, start crop image activity

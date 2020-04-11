@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.rideeinhands">
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
-    -->
+
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -18,7 +14,12 @@
         android:roundIcon="@drawable/app_logo_circle"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AvailableTrips"></activity>
+        <activity
+            android:name=".RequestsActivity"
+            android:parentActivityName=".TripDetailActivity"></activity>
+        <activity
+            android:name=".AvailableTrips"
+            android:parentActivityName=".SelectLocation" />
         <activity android:name=".GetARideActivity" />
         <activity
             android:name=".TripDetailActivity"

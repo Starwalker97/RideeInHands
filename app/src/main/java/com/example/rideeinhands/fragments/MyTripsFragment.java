@@ -74,6 +74,7 @@ public class MyTripsFragment extends Fragment {
                 tripsViewHolder.setName(tripModel.getName());
                 tripsViewHolder.setDate(tripModel.getDate());
                 tripsViewHolder.setDestination(tripModel.getDestination());
+                tripModel.setTripId(getSnapshots().getSnapshot(i).getId());
                 activetripsList.add(tripModel);
 
             }
@@ -88,6 +89,7 @@ public class MyTripsFragment extends Fragment {
                         Intent intent = new Intent(getContext(), TripDetailActivity.class);
                         int itemPosition = recyclerView.getChildLayoutPosition(view);
                         intent.putExtra("position", itemPosition);
+                        intent.putExtra("whichActivity", "MyTripsFragment");
                         startActivity(intent);
                     }
                 });

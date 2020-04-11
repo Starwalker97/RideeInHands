@@ -66,7 +66,9 @@ import java.util.Locale;
 import java.util.Map;
 
 public class SelectLocation extends AppCompatActivity {
+    public static ArrayList<TripModel> tripsList;
     TextInputLayout destinationLayout, startingLayout;
+
     EditText startingPoint, destinationPoint;
     int AUTOCOMPLETE_STARTING_POINT_REQUEST_CODE = 1;
     int AUTOCOMPLETE_DESTINATION_POINT_REQUEST_CODE = 2;
@@ -76,7 +78,6 @@ public class SelectLocation extends AppCompatActivity {
     Toolbar toolbar;
     FirebaseFirestore firebaseFirestore;
     FirebaseAuth firebaseAuth;
-    public static ArrayList<TripModel> tripsList;
     Map<String, String> hashMap;
     String routeString;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -177,39 +178,54 @@ public class SelectLocation extends AppCompatActivity {
                                             .collection("Trips")
                                             .document(documentSnapshot.getId())
                                             .collection("Pending");
-                                    collectionReference1.
-                                            whereEqualTo("Destination", "Lahore Lahore, Punjab, Pakistan")
+                                    collectionReference1
+                                            .whereEqualTo("Destination", destinationPoint.getText().toString())
+                                            .whereEqualTo("Date", tripDate)
                                             .get()
                                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                     if (task.isSuccessful()) {
+                                                        if (task.getResult().size() == 0) {
+                                                            Toast.makeText(SelectLocation.this, "No trip found..", Toast.LENGTH_SHORT).show();
+                                                        }
                                                         for (int i = 0; i < task.getResult().size(); i++) {
+
                                                             DocumentSnapshot documentSnapshot1
                                                                     = task.getResult().getDocuments()
                                                                     .get(i);
-                                                            tripsList.add(
-                                                                    new TripModel(
-                                                                            documentSnapshot1.getString("Name")
-                                                                            , documentSnapshot1.getString("Detail")
-                                                                            , documentSnapshot1.getString("Start")
-                                                                            , documentSnapshot1.getString("Destination")
-                                                                            , documentSnapshot1.getString("StartLocation")
-                                                                            , documentSnapshot1.getString("DestinationLocation")
-                                                                            , documentSnapshot1.getString("Date")
-                                                                            , documentSnapshot1.getString("Time")
-                                                                            , documentSnapshot1.getString("Route")
-                                                                    )
-                                                            );
-                                                        }
 
-                                                        Intent intent = new Intent(SelectLocation.this, AvailableTrips.class);
-                                                        startActivity(intent);
+//                                                            if (documentSnapshot1.getString("Route").contains("\"lat\" : "+startingPointLoc.latitude+",               \"lng\" : "+startingPointLoc.longitude)){
+//
+                                                            TripModel newModel = new TripModel(
+                                                                    documentSnapshot1.getString("Name")
+                                                                    , documentSnapshot1.getString("Detail")
+                                                                    , documentSnapshot1.getString("Start")
+                                                                    , documentSnapshot1.getString("Destination")
+                                                                    , documentSnapshot1.getString("StartLocation")
+                                                                    , documentSnapshot1.getString("DestinationLocation")
+                                                                    , documentSnapshot1.getString("Date")
+                                                                    , documentSnapshot1.getString("Time")
+                                                                    , documentSnapshot1.getString("Route")
+                                                            );
+                                                            newModel.setUserId(documentSnapshot.getId());
+                                                            newModel.setTripId(documentSnapshot1.getId());
+                                                            Toast.makeText(SelectLocation.this, newModel.getTripId(), Toast.LENGTH_SHORT).show();
+                                                            tripsList.add(
+                                                                    newModel
+                                                            );
+                                                            //}
+
+                                                            if (i == task.getResult().size() - 1) {
+                                                                Intent intent = new Intent(SelectLocation.this, AvailableTrips.class);
+                                                                intent.putExtra("PickupPoint", startingPoint.getText().toString());
+                                                                startActivity(intent);
+                                                            }
+                                                        }
 
                                                     }
                                                 }
                                             });
-
                                 }
                             }
                         }
@@ -364,7 +380,6 @@ public class SelectLocation extends AppCompatActivity {
                         destinationPoint.setText(addresses.get(0).getAddressLine(addresses.get(0).getMaxAddressLineIndex()));
                         DownloadTask downloadTask = new DownloadTask();
                         downloadTask.execute(url);
-
                     }
                 });
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
@@ -398,6 +413,7 @@ public class SelectLocation extends AppCompatActivity {
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                         } else {
+
                         }
                     }
                 });
@@ -507,6 +523,25 @@ public class SelectLocation extends AppCompatActivity {
         }
     }
 
+    public List<List<HashMap<String, String>>> parse(String... json) {
+        JSONObject jObject;
+        List<List<HashMap<String, String>>> routes = null;
+
+        try {
+            jObject = new JSONObject(json[0]);
+            DirectionsJSONParser parser = new DirectionsJSONParser();
+
+
+            routes = parser.parse(jObject);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return routes;
+    }
+
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         // Parsing the data in non-ui thread
@@ -566,9 +601,12 @@ public class SelectLocation extends AppCompatActivity {
             mMap.addPolyline(lineOptions)
                     .setStartCap(new RoundCap());
 
-
         }
+
+
     }
+
+
 
 
 }
