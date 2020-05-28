@@ -26,10 +26,6 @@
             android:background="@android:color/white"
 
             />
-
-
-
-
     </RelativeLayout>
 
    <com.google.android.material.navigation.NavigationView
@@ -37,6 +33,8 @@
        android:layout_width="wrap_content"
        android:layout_height="match_parent"
        android:layout_gravity="left"
+       app:itemTextColor="@color/colorPrimary"
+       app:itemIconTint="@color/colorPrimary"
        app:headerLayout="@layout/nav_header"
        app:menu="@menu/nav_menu"/>
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -10,11 +10,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.rideeinhands.adminactivities.MainActivityAdmin;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 public class LoginActivity extends AppCompatActivity {
@@ -23,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     MaterialEditText email, password;
     ProgressDialog progressDialog;
     FirebaseAuth firebaseAuth;
+    private DocumentReference documentReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +62,23 @@ public class LoginActivity extends AppCompatActivity {
                                                 if (task.isSuccessful()){
                                                     if (firebaseAuth.getCurrentUser().isEmailVerified()){
                                                         progressDialog.dismiss();
-                                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                                        startActivity(intent);
-                                                        finish();
+                                                        documentReference = FirebaseFirestore.getInstance().collection("Users")
+                                                                .document(firebaseAuth.getUid());
+                                                        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                if (task.getResult().get("Role").equals("user")){
+                                                                    Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                                                                    LoginActivity.this.startActivity(mainIntent);
+                                                                    LoginActivity.this.finish();
+                                                                }
+                                                                else if (task.getResult().get("Role").equals("admin")){
+                                                                    Intent mainIntent = new Intent(LoginActivity.this, MainActivityAdmin.class);
+                                                                    LoginActivity.this.startActivity(mainIntent);
+                                                                    LoginActivity.this.finish();
+                                                                }
+                                                            }
+                                                        });
                                                     }
                                                     else {
                                                         progressDialog.dismiss();

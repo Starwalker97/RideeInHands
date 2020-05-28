@@ -18,7 +18,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.rideeinhands.fragments.MainFragment;
 import com.example.rideeinhands.fragments.MyAccountFragment;
+import com.example.rideeinhands.fragments.MyLicenseFragment;
 import com.example.rideeinhands.fragments.MyTripsFragment;
+import com.example.rideeinhands.fragments.MyVehiclesFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -52,10 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        db.setFirestoreSettings(settings);
+
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         toolbar = findViewById(R.id.toolbar);
@@ -104,13 +103,18 @@ public class MainActivity extends AppCompatActivity {
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyAccountFragment()).commit();
                         break;
-
+                    case R.id.myVehicles:
+                        drawerLayout.closeDrawer(GravityCompat.START, false);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyVehiclesFragment()).commit();
+                        break;
+                    case R.id.myLicenses:
+                        drawerLayout.closeDrawer(GravityCompat.START, false);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyLicenseFragment()).commit();
+                        break;
                     case R.id.activeTrips:
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyTripsFragment()).commit();
                         break;
-
-
                     case R.id.log_out:
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -124,8 +128,6 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 finish();
                                 firebaseAuth.signOut();
-
-
                             }
                         });
                         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {

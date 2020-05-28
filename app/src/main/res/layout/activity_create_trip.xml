@@ -93,7 +93,4 @@
         android:layout_marginTop="20dp"
         android:text="Next"/>
 
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

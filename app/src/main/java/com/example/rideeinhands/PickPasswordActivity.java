@@ -64,6 +64,7 @@ public class PickPasswordActivity extends AppCompatActivity {
         object.put("DateOfBirth",dateOfBirth);
         object.put("MobileNumber",number);
         object.put("EmailAddress",email);
+        object.put("Role", "user");
         findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

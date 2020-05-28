@@ -8,6 +8,14 @@
         android:title="My Account"
         android:icon="@drawable/ic_account_box_black_24dp"
         />
+    <item android:id="@+id/myVehicles"
+        android:title="My Vehicles"
+        android:icon="@drawable/ic_directions_car_black_24dp"
+        />
+    <item android:id="@+id/myLicenses"
+        android:title="My License"
+        android:icon="@drawable/license_icon"
+        />
     <item
         android:id="@+id/activeTrips"
         android:icon="@drawable/ic_location_on_black_24dp"

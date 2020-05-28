@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CreateTripActivity">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:title="Add Vehicle"
+        android:background="@color/colorPrimary"
+        app:titleTextColor="@android:color/white"
+        app:theme="@android:style/Theme.Holo.Light.DarkActionBar"
+
+        />
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="225dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="80dp"
+        android:text="Select type of vehicle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/type"
+        android:layout_width="225dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="100dp"
+        android:entries="@array/type"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/Company"
+        android:layout_width="225dp"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toBottomOf="@id/type"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        app:layout_constraintHorizontal_bias="0.2"
+        android:hint="Company"
+        />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/Model"
+        android:layout_width="225dp"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toBottomOf="@id/Company"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        app:layout_constraintHorizontal_bias="0.2"
+        android:hint="Model"
+        />
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:id="@+id/registrationNumber"
+        android:layout_width="225dp"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toBottomOf="@id/Model"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        app:layout_constraintHorizontal_bias="0.2"
+        android:hint="Registeration Number"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/submit"
+        android:layout_width="225dp"
+        android:layout_height="60dp"
+        android:clickable="false"
+        app:layout_constraintTop_toBottomOf="@id/registrationNumber"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp"
+        android:text="Add"
+        android:backgroundTint="@color/colorPrimary"/>
+    <ProgressBar
+        android:id="@+id/progress_circular"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:indeterminate="true"
+        android:elevation="10dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/submit"
+        app:layout_constraintStart_toStartOf="@id/submit"
+        app:layout_constraintEnd_toEndOf="@id/submit"
+        app:layout_constraintBottom_toBottomOf="@id/submit"
+        />
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

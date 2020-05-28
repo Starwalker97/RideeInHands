@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/RideeInHands.iml" filepath="$PROJECT_DIR$/.idea/RideeInHands.iml" group="RideeInHands" />
+      <module fileurl="file://$PROJECT_DIR$/admin/RideeInHands-admin.iml" filepath="$PROJECT_DIR$/admin/RideeInHands-admin.iml" group="RideeInHands/admin" />
+      <module fileurl="file://$PROJECT_DIR$/app/admin/admin.iml" filepath="$PROJECT_DIR$/app/admin/admin.iml" group="RideeInHands/app/admin" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="RideeInHands/app" />
+      <module fileurl="file://$PROJECT_DIR$/app/admin/app-admin.iml" filepath="$PROJECT_DIR$/app/admin/app-admin.iml" />
+    </modules>
+  </component>
+</project>
