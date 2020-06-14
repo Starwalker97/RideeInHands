@@ -34,6 +34,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -75,9 +76,7 @@ public class TripDetailActivity extends AppCompatActivity {
         del = findViewById(R.id.del);
         whichActivity = getIntent().getStringExtra("whichActivity");
         firebaseFirestore = FirebaseFirestore.getInstance();
-        CollectionReference collectionReference = firebaseFirestore.collection("Trips")
-                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .collection("Pending");
+        CollectionReference collectionReference = firebaseFirestore.collection("Trips");
 
 
         int itemPosition = getIntent().getIntExtra("position", 0);
@@ -141,30 +140,23 @@ public class TripDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (reqsBtn.getText().toString().equals("Request Trip")) {
                     String currentdate = Calendar.getInstance().getTime().toString();
-                    HashMap<String, String> map = new HashMap<>();
-                    map.put("Status", "Requested");
-                    map.put("DateTime", currentdate);
-                    map.put("PickUpPoint", getIntent().getStringExtra("PickupPoint"));
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("Status", "Pending");
+                    map.put("From", FirebaseAuth.getInstance().getUid());
+                    map.put("To", activeTrip.getRideHolder());
+                    map.put("Time", currentdate);
+                    map.put("Passengers",Integer.parseInt(getIntent().getStringExtra("passengers")));
+                    map.put("TripID",activeTrip.getTripId());
                     reqsBtn.setEnabled(false);
-                    firebaseFirestore.collection("Trips")
-                            .document(activeTrip.getUserId())
-                            .collection("Pending")
-                            .document(activeTrip.getTripId())
-                            .collection("Requests")
-                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .set(map)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    firebaseFirestore.collection("Requests")
+                            .add(map)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        reqsBtn.setText("Cancel Request");
-                                        reqsBtn.setEnabled(true);
-                                        reqsBtn.setTextColor(Color.WHITE);
-                                        reqsBtn.setBackgroundColor(getColor(R.color.colorPrimary));
-                                        reqsBtn.setIcon(getDrawable(R.drawable.ic_clear_white_24dp));
-                                    } else {
-                                        Toast.makeText(TripDetailActivity.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
-                                    }
+                                public void onSuccess(DocumentReference documentReference) {
+                                    reqsBtn.setEnabled(true);
+                                    Intent intent = new Intent(TripDetailActivity.this, WaitForAcceptance.class);
+                                    intent.putExtra("requestID",documentReference.getId());
+                                    startActivity(intent);
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
@@ -176,7 +168,14 @@ public class TripDetailActivity extends AppCompatActivity {
 
                 } else if (reqsBtn.getText().toString().equals("See Requests")) {
                     Intent intent = new Intent(TripDetailActivity.this, RequestsActivity.class);
-                    startActivity(intent);
+                    collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            intent.putExtra("docID",queryDocumentSnapshots.getDocuments().get(itemPosition).getId());
+                            startActivity(intent);
+                        }
+                    });
+
                 }
             }
         });

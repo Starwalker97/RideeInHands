@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +37,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropOverlayView;
 
@@ -132,7 +135,32 @@ public class LicensesFragment extends Fragment {
 
         void setImage(String image) {
             ImageView imageView = view.findViewById(R.id.licenseImage);
-            Picasso.get().load(Uri.parse(image)).into(imageView);
+            ProgressBar progressBar = view.findViewById(R.id.progress_circular);
+            progressBar.setVisibility(View.VISIBLE);
+            Picasso.get().load(Uri.parse(image)).networkPolicy(NetworkPolicy.OFFLINE).into(imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    progressBar.setVisibility(View.GONE);
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Picasso.get().load(Uri.parse(image)).into(imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            progressBar.setVisibility(View.GONE);
+
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(getContext(), "Failed to load some images", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
         }
 
         void setStatus(String status) {

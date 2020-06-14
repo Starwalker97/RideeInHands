@@ -62,8 +62,7 @@ public class MyTripsFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        Query query = firebaseFirestore.collection("Trips").document(firebaseAuth.getCurrentUser().getUid())
-                .collection("Pending");
+        Query query = firebaseFirestore.collection("Trips").whereEqualTo("RideHolder",FirebaseAuth.getInstance().getUid());
         FirestoreRecyclerOptions<TripModel> options = new FirestoreRecyclerOptions.Builder<TripModel>()
                 .setQuery(query, TripModel.class)
                 .build();

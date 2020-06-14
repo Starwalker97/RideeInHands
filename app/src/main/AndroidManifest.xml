@@ -15,21 +15,22 @@
         android:roundIcon="@drawable/app_logo_circle"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".adminactivities.MainActivityAdmin"></activity>
-        <activity android:name=".AddVehicleActivity"></activity>
+        <activity android:name=".TripActivity"></activity>
+        <activity android:name=".HeadTowardsActivity" />
+        <activity android:name=".WaitForAcceptance" />
+        <activity android:name=".SelectVehicleActivity" />
+        <activity android:name=".adminactivities.UserDetailsActivity" />
+        <activity android:name=".adminactivities.MainActivityAdmin" />
+        <activity android:name=".AddVehicleActivity" />
         <activity
             android:name=".RequestsActivity"
             android:parentActivityName=".TripDetailActivity" />
-        <activity
-            android:name=".AvailableTrips"
-            android:parentActivityName=".SelectLocation" />
+        <activity android:name=".AvailableTrips" />
         <activity android:name=".GetARideActivity" />
         <activity
             android:name=".TripDetailActivity"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".SelectLocation"
-            android:parentActivityName=".CreateTripActivity" />
+        <activity android:name=".SelectLocation" />
         <activity
             android:name=".CreateTripActivity"
             android:parentActivityName=".MainActivity" />

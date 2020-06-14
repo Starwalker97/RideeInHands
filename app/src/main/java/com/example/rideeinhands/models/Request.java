@@ -2,47 +2,70 @@ package com.example.rideeinhands.models;
 
 public class Request {
 
-    String userId;
-    String status;
-    String dateTime;
-    String pickupPoint;
+    String From;
+    Integer Passengers;
+    String Status;
+    String Time;
+    String To;
+    String TripID;
 
-    public Request(String userId, String status, String dateTime, String pickupPoint) {
-        this.userId = userId;
-        this.status = status;
-        this.dateTime = dateTime;
-        this.pickupPoint = pickupPoint;
+    public Request() {
     }
 
-    public String getUserId() {
-        return userId;
+    public Request(String from, Integer passengers, String status, String time, String to, String tripID) {
+        From = from;
+        Passengers = passengers;
+        Status = status;
+        Time = time;
+        To = to;
+        TripID = tripID;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getFrom() {
+        return From;
+    }
+
+    public void setFrom(String from) {
+        From = from;
+    }
+
+    public Integer getPassengers() {
+        return Passengers;
+    }
+
+    public void setPassengers(Integer passengers) {
+        Passengers = passengers;
     }
 
     public String getStatus() {
-        return status;
+        return Status;
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        Status = status;
     }
 
-    public String getDateTime() {
-        return dateTime;
+    public String getTime() {
+        return Time;
     }
 
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
+    public void setTime(String time) {
+        Time = time;
     }
 
-    public String getPickupPoint() {
-        return pickupPoint;
+    public String getTo() {
+        return To;
     }
 
-    public void setPickupPoint(String pickupPoint) {
-        this.pickupPoint = pickupPoint;
+    public void setTo(String to) {
+        To = to;
+    }
+
+    public String getTripID() {
+        return TripID;
+    }
+
+    public void setTripID(String tripID) {
+        TripID = tripID;
     }
 }

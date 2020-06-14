@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:paddingBottom="15dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/userImage"
@@ -13,6 +14,16 @@
         android:src="@drawable/ic_account_circle_gray_24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <ProgressBar
+        android:id="@+id/progress_circular2"
+        android:visibility="gone"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintTop_toTopOf="@id/userImage"
+        app:layout_constraintBottom_toBottomOf="@id/userImage"
+        app:layout_constraintStart_toStartOf="@id/userImage"
+        app:layout_constraintEnd_toEndOf="@id/userImage"
+        />
 
     <TextView
         android:id="@+id/userName"
@@ -28,15 +39,6 @@
         app:layout_constraintTop_toTopOf="@id/userImage"
         app:layout_constraintVertical_bias="0.3" />
 
-    <TextView
-        android:id="@+id/pickupPoint"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Pick up point"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="@id/userName"
-        app:layout_constraintTop_toBottomOf="@id/userName" />
 
     <TextView
         android:id="@+id/acceptText"
@@ -46,8 +48,8 @@
         android:text="You have accepted the trip request"
         android:textColor="@color/colorPrimary"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@id/pickupPoint"
-        app:layout_constraintTop_toBottomOf="@id/pickupPoint" />
+        app:layout_constraintStart_toStartOf="@id/userName"
+        app:layout_constraintTop_toBottomOf="@id/userName" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/accept"
@@ -57,8 +59,8 @@
         android:layout_marginTop="20dp"
         android:text="Accept"
         android:textColor="@color/accept_green"
-        app:layout_constraintStart_toStartOf="@id/pickupPoint"
-        app:layout_constraintTop_toBottomOf="@id/pickupPoint"
+        app:layout_constraintStart_toStartOf="@id/userName"
+        app:layout_constraintTop_toBottomOf="@id/userName"
         app:rippleColor="@color/accept_green"
         app:strokeColor="@color/accept_green"
         app:strokeWidth="2dp" />
@@ -73,7 +75,7 @@
         android:text="Cancel"
         android:textColor="@color/reject_red"
         app:layout_constraintStart_toEndOf="@id/accept"
-        app:layout_constraintTop_toBottomOf="@id/pickupPoint"
+        app:layout_constraintTop_toBottomOf="@id/userName"
         app:rippleColor="@color/reject_red"
         app:strokeColor="@color/reject_red"
         app:strokeWidth="2dp" />

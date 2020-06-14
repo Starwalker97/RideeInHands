@@ -1,121 +1,181 @@
 package com.example.rideeinhands;
 
 import android.content.Intent;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rideeinhands.adminactivities.UserDetailsActivity;
+import com.example.rideeinhands.adminfragments.UserManagement;
+import com.example.rideeinhands.adminmodels.User;
 import com.example.rideeinhands.databinding.ActivityAvailableTripsBinding;
 import com.example.rideeinhands.models.TripModel;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AvailableTrips extends AppCompatActivity {
     public static ArrayList<TripModel> tripsList;
     ActivityAvailableTripsBinding binding;
     FirebaseFirestore firebaseFirestore;
     FirebaseAuth firebaseAuth;
+    LatLng originLatLng, destinationLatLng;
+    String no_of_passengers;
+    RecyclerView recyclerView;
+    FirestoreRecyclerAdapter<TripModel, AvailableTrips.TripsViewHolder> firestoreRecyclerAdapter;
+    private ArrayList<TripModel> Trips;
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        firestoreRecyclerAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (firestoreRecyclerAdapter != null) {
+            firestoreRecyclerAdapter.stopListening();
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityAvailableTripsBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        tripsList = new ArrayList<>();
+        originLatLng = new LatLng(getIntent().getDoubleExtra("startLocationLat",0.0),
+                getIntent().getDoubleExtra("startLocationLong",0.0));
+        destinationLatLng = new LatLng(getIntent().getDoubleExtra("destinationLocationLat",0.0),
+                getIntent().getDoubleExtra("destinationLocationLong",0.0));
+        no_of_passengers = getIntent().getStringExtra("no_of_passengers");
+
         setSupportActionBar(binding.toolbar);
         getSupportActionBar().setTitle("Available Trips");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        firebaseAuth = FirebaseAuth.getInstance();
+        recyclerView = binding.recyclerView;
         firebaseFirestore = FirebaseFirestore.getInstance();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        binding.recyclerView.setLayoutManager(layoutManager);
-        tripsList = SelectLocation.tripsList;
-        binding.recyclerView.setHasFixedSize(true);
-        AvailableTripsAdapter availableTripsAdapter = new AvailableTripsAdapter(tripsList);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.recyclerView.getContext(),
+        Trips = new ArrayList<>();
+        firebaseAuth = FirebaseAuth.getInstance();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(AvailableTrips.this);
+        recyclerView.setLayoutManager(layoutManager);
+        Query query = firebaseFirestore.collection("Trips")
+                .whereEqualTo("DestinationLocation",destinationLatLng.latitude+","+destinationLatLng.longitude)
+                .whereGreaterThanOrEqualTo("NumberOfPassengers", Integer.parseInt(no_of_passengers))
+                .whereEqualTo("Status","pending");
+        FirestoreRecyclerOptions<TripModel> options = new FirestoreRecyclerOptions.Builder<TripModel>()
+                .setQuery(query, TripModel.class)
+                .build();
+        firestoreRecyclerAdapter = new FirestoreRecyclerAdapter<TripModel, AvailableTrips.TripsViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull AvailableTrips.TripsViewHolder TripsViewHolder, int i, @NonNull TripModel Trip) {
+                String[] splitone = Trip.getStartLocation().split(",");
+                if (checkForArea(1,originLatLng,new LatLng(Double.parseDouble(splitone[0]),Double.parseDouble(splitone[1])))) {
+                    TripsViewHolder.setDate(Trip.getDate());
+                    TripsViewHolder.setName(Trip.getName());
+                    TripsViewHolder.setDestination(Trip.getDestination());
+                    Trip.setTripId(getSnapshots().getSnapshot(i).getId());
+                    tripsList.add(Trip);
+                } else {
+                    TripsViewHolder.itemView.setVisibility(View.GONE);
+                    TripsViewHolder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+                }
+            }
+            @NonNull
+            @Override
+            public AvailableTrips.TripsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_trip_layout, parent, false);
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(AvailableTrips.this, TripDetailActivity.class);
+                        intent.putExtra("whichActivity","AvailableTrips");
+                        intent.putExtra("passengers",no_of_passengers);
+                        intent.putExtra("position",recyclerView.getChildLayoutPosition(v));
+                        startActivity(intent);
+                    }
+                });
+                return new AvailableTrips.TripsViewHolder(view);
+            }
+        };
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
-        binding.recyclerView.addItemDecoration(dividerItemDecoration);
-        binding.recyclerView.setAdapter(availableTripsAdapter);
+        recyclerView.addItemDecoration(dividerItemDecoration);
+        recyclerView.setAdapter(firestoreRecyclerAdapter);
+
 
 
     }
-
-    public class AvailableTripsAdapter extends RecyclerView.Adapter<AvailableTripsAdapter.MyViewHolder> {
-        AvailableTrips availableTrips;
-        private ArrayList<TripModel> mDataset;
-
-
-        // Provide a suitable constructor (depends on the kind of dataset)
-        public AvailableTripsAdapter(ArrayList<TripModel> myDataset) {
-            mDataset = myDataset;
+    private class TripsViewHolder extends RecyclerView.ViewHolder {
+        private View view;
+        public TripsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            view = itemView;
+        }
+        void setDate(String date){
+            TextView textView = view.findViewById(R.id.date);
+            textView.setText(date);
+        }
+        void setDestination(String destination) {
+            TextView textView = view.findViewById(R.id.destination);
+            textView.setText(destination);
         }
 
-        // Create new views (invoked by the layout manager)
-        @Override
-        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            // create a new view
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.single_trip_layout, parent, false);
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int itemPosition = binding.recyclerView.getChildLayoutPosition(v);
-                    Intent intent = new Intent(AvailableTrips.this, TripDetailActivity.class);
-                    intent.putExtra("position", itemPosition);
-                    intent.putExtra("whichActivity", "AvailableTrips");
-                    intent.putExtra("PickupPoint", getIntent().getStringExtra("PickupPoint"));
-                    startActivity(intent);
-                }
-            });
-            MyViewHolder vh = new MyViewHolder(v);
-            return vh;
+        void setName(String name) {
+            TextView textView = view.findViewById(R.id.tripName);
+            textView.setText(name);
         }
 
-        // Replace the contents of a view (invoked by the layout manager)
-        @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
-            // - get element from your dataset at this position
-            // - replace the contents of the view with that element
-            holder.tripName.setText(mDataset.get(position).getName());
-            holder.date.setText(mDataset.get(position).getDate());
-            holder.destination.setText(mDataset.get(position).getDestination());
 
+    }
+    private boolean checkForArea(int rad, LatLng fromPosition, LatLng toPosition) {
+        Location locationA = new Location("point A");
+        locationA.setLatitude(fromPosition.latitude);
+        locationA.setLongitude(fromPosition.longitude);
+        Location locationB = new Location("point B");
+        locationB.setLatitude(toPosition.latitude);
+        locationB.setLongitude(toPosition.longitude);
+        int distance = (int) locationA.distanceTo(locationB);
+        if (distance / 1000 <= rad)
+            return true;
+        else
+            return false;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
         }
-
-        // Return the size of your dataset (invoked by the layout manager)
-        @Override
-        public int getItemCount() {
-            return mDataset.size();
-        }
-
-        // Provide a reference to the views for each data item
-        // Complex data items may need more than one view per item, and
-        // you provide access to all the views for a data item in a view holder
-        public class MyViewHolder extends RecyclerView.ViewHolder {
-            // each data item is just a string in this case
-            public TextView tripName;
-            public TextView destination;
-            public TextView date;
-
-            public MyViewHolder(View view) {
-                super(view);
-                this.tripName = view.findViewById(R.id.tripName);
-                this.destination = view.findViewById(R.id.destination);
-                this.date = view.findViewById(R.id.date);
-
-
-            }
-        }
+        return true;
     }
 
 }

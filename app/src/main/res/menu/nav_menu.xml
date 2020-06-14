@@ -20,6 +20,10 @@
         android:id="@+id/activeTrips"
         android:icon="@drawable/ic_location_on_black_24dp"
         android:title="Active Trips" />
+    <item
+        android:id="@+id/wallet"
+        android:icon="@drawable/ic_baseline_account_balance_wallet_24"
+        android:title="My Wallet" />
 
     <item android:id="@+id/log_out"
         android:title="Log Out"

@@ -15,35 +15,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:theme="@android:style/Theme.Holo.Light.DarkActionBar"
-        app:title="Select Time and Date"
+        app:title="Select Number of Passengers"
         app:titleTextColor="@android:color/white"
 
         />
 
-
-    <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/tripDate"
-        android:layout_width="225dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="20dp"
-        android:editable="false"
-        android:hint="Trip Date"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
-
-    <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/tripTime"
-        android:layout_width="225dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="20dp"
-        android:editable="false"
-        android:hint="Trip Time"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tripDate" />
 
     <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/no_of_passengers"
@@ -53,9 +29,11 @@
         android:hint="No. of passengers"
         android:inputType="number"
         android:singleLine="true"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tripTime" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/submit"

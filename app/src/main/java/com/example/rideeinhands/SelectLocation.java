@@ -1,6 +1,8 @@
 package com.example.rideeinhands;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -9,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -16,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import com.example.rideeinhands.models.TripModel;
 import com.google.android.gms.common.api.Status;
@@ -46,6 +50,7 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -74,11 +79,11 @@ public class SelectLocation extends AppCompatActivity {
     int AUTOCOMPLETE_DESTINATION_POINT_REQUEST_CODE = 2;
     LatLng startingPointLoc, destinationPointLoc;
     GoogleMap mMap;
-    String tripName, tripDetail, tripDate, tripTime, no_of_passengers;
+    String tripName, tripDetail, tripDate, tripTime, no_of_passengers, vehicle;
     Toolbar toolbar;
     FirebaseFirestore firebaseFirestore;
     FirebaseAuth firebaseAuth;
-    Map<String, String> hashMap;
+    Map<String, Object> hashMap;
     String routeString;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
@@ -98,6 +103,7 @@ public class SelectLocation extends AppCompatActivity {
         tripDetail = getIntent().getStringExtra("tripDetail");
         tripTime = getIntent().getStringExtra("tripTime");
         no_of_passengers = getIntent().getStringExtra("no_of_passengers");
+        vehicle = getIntent().getStringExtra("vehicle");
 
 
         toolbar = findViewById(R.id.toolbar);
@@ -111,6 +117,16 @@ public class SelectLocation extends AppCompatActivity {
             public void onMapReady(GoogleMap googleMap) {
                 mMap = googleMap;
 
+                if (ActivityCompat.checkSelfPermission(SelectLocation.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(SelectLocation.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
                 mMap.setMyLocationEnabled(true);
 
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -125,111 +141,45 @@ public class SelectLocation extends AppCompatActivity {
                     hashMap.put("Detail", tripDetail);
                     hashMap.put("Date", tripDate);
                     hashMap.put("Time", tripTime);
-                    hashMap.put("Number of Passengers", no_of_passengers);
+                    hashMap.put("Vehicle", vehicle);
+                    hashMap.put("RideHolder", FirebaseAuth.getInstance().getUid());
+                    hashMap.put("NumberOfPassengers", Integer.parseInt(no_of_passengers));
                     hashMap.put("Start", startingPoint.getText().toString());
                     hashMap.put("Destination", destinationPoint.getText().toString());
                     hashMap.put("StartLocation", startingPointLoc.latitude + "," + startingPointLoc.longitude);
                     hashMap.put("DestinationLocation", destinationPointLoc.latitude + "," + destinationPointLoc.longitude);
                     hashMap.put("Route", routeString);
-
-                    HashMap<String, String> enabled = new HashMap<>();
-                    enabled.put("enabled", "true");
-
-                    CollectionReference collectionReference = firebaseFirestore.collection("Trips")
-                            .document(firebaseAuth.getCurrentUser().getUid())
-                            .collection("Pending");
-                    collectionReference.document(collectionReference.document().getId()).set(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                firebaseFirestore.collection("Trips").document(firebaseAuth.getCurrentUser().getUid())
-                                        .set(enabled);
-                                Toast.makeText(SelectLocation.this, "Trip Created", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                                intent.putExtra("fragtoLoad", "ActiveTrips");
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                Toast.makeText(SelectLocation.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(SelectLocation.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                            .addOnCanceledListener(new OnCanceledListener() {
-                                @Override
-                                public void onCanceled() {
-                                    Toast.makeText(SelectLocation.this, "Cancelled", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                } else if (whichActivity.equals("GetARide")) {
-                    tripsList = new ArrayList<>();
+                    hashMap.put("Status", "pending");
                     CollectionReference collectionReference = firebaseFirestore.collection("Trips");
-                    collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    collectionReference.add(hashMap).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                                    CollectionReference collectionReference1 = firebaseFirestore
-                                            .collection("Trips")
-                                            .document(documentSnapshot.getId())
-                                            .collection("Pending");
-                                    collectionReference1
-                                            .whereEqualTo("Destination", destinationPoint.getText().toString())
-                                            .whereEqualTo("Date", tripDate)
-                                            .get()
-                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                    if (task.isSuccessful()) {
-                                                        if (task.getResult().size() == 0) {
-                                                            Toast.makeText(SelectLocation.this, "No trip found..", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                        for (int i = 0; i < task.getResult().size(); i++) {
-
-                                                            DocumentSnapshot documentSnapshot1
-                                                                    = task.getResult().getDocuments()
-                                                                    .get(i);
-
-//                                                            if (documentSnapshot1.getString("Route").contains("\"lat\" : "+startingPointLoc.latitude+",               \"lng\" : "+startingPointLoc.longitude)){
-//
-                                                            TripModel newModel = new TripModel(
-                                                                    documentSnapshot1.getString("Name")
-                                                                    , documentSnapshot1.getString("Detail")
-                                                                    , documentSnapshot1.getString("Start")
-                                                                    , documentSnapshot1.getString("Destination")
-                                                                    , documentSnapshot1.getString("StartLocation")
-                                                                    , documentSnapshot1.getString("DestinationLocation")
-                                                                    , documentSnapshot1.getString("Date")
-                                                                    , documentSnapshot1.getString("Time")
-                                                                    , documentSnapshot1.getString("Route")
-                                                            );
-                                                            newModel.setUserId(documentSnapshot.getId());
-                                                            newModel.setTripId(documentSnapshot1.getId());
-                                                            Toast.makeText(SelectLocation.this, newModel.getTripId(), Toast.LENGTH_SHORT).show();
-                                                            tripsList.add(
-                                                                    newModel
-                                                            );
-                                                            //}
-
-                                                            if (i == task.getResult().size() - 1) {
-                                                                Intent intent = new Intent(SelectLocation.this, AvailableTrips.class);
-                                                                intent.putExtra("PickupPoint", startingPoint.getText().toString());
-                                                                startActivity(intent);
-                                                            }
-                                                        }
-
-                                                    }
-                                                }
-                                            });
-                                }
-                            }
+                        public void onSuccess(DocumentReference documentReference) {
+                            Intent intent = new Intent(SelectLocation.this, RequestsActivity.class);
+                            intent.putExtra("docID", documentReference.getId());
+                            startActivity(intent);
+                            finish();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(SelectLocation.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnCanceledListener(new OnCanceledListener() {
+                        @Override
+                        public void onCanceled() {
+                            Toast.makeText(SelectLocation.this, "Cancelled", Toast.LENGTH_SHORT).show();
                         }
                     });
+                } else if (whichActivity.equals("GetARide")) {
+                    tripsList = new ArrayList<>();
+                    Intent intent = new Intent(SelectLocation.this, AvailableTrips.class);
+                    intent.putExtra("startLocationLat", startingPointLoc.latitude);
+                    intent.putExtra("startLocationLong", startingPointLoc.longitude);
+                    intent.putExtra("destinationLocationLat", destinationPointLoc.latitude);
+                    intent.putExtra("destinationLocationLong", destinationPointLoc.longitude);
+                    intent.putExtra("no_of_passengers", no_of_passengers);
+                    startActivity(intent);
+
 
                 }
 
@@ -398,6 +348,16 @@ public class SelectLocation extends AppCompatActivity {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
+                if (ActivityCompat.checkSelfPermission(SelectLocation.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(SelectLocation.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
                 fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
@@ -606,7 +566,15 @@ public class SelectLocation extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+        }
+        return true;
+    }
 
 
 }

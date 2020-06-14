@@ -13,12 +13,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.rideeinhands.LoginActivity;
 import com.example.rideeinhands.R;
 import com.example.rideeinhands.adminfragments.LicensesFragment;
+import com.example.rideeinhands.adminfragments.UserManagement;
 import com.example.rideeinhands.fragments.MainFragment;
 import com.example.rideeinhands.fragments.MyAccountFragment;
 import com.example.rideeinhands.fragments.MyLicenseFragment;
@@ -32,6 +34,8 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nullable;
@@ -71,7 +75,6 @@ public class MainActivityAdmin extends AppCompatActivity {
         if (fragToLoad != null) {
             if (fragToLoad.equals("ActiveTrips")) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyTripsFragment()).commit();
-
             }
         }
 
@@ -87,8 +90,26 @@ public class MainActivityAdmin extends AppCompatActivity {
                 TextView textView = navigationView.getHeaderView(0).findViewById(R.id.username);
                 textView.setText(username);
                 CircleImageView circleImageView = navigationView.getHeaderView(0).findViewById(R.id.img);
-                Picasso.get().load(Uri.parse(profilePicture)).placeholder(R.drawable.ic_account_circle_black_24dp).into(circleImageView);
+                Picasso.get().load(profilePicture).networkPolicy(NetworkPolicy.OFFLINE).into(circleImageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
 
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Picasso.get().load(profilePicture).into(circleImageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+                            @Override
+                            public void onError(Exception e) {
+                                Toast.makeText(MainActivityAdmin.this, "Failed to load some images", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
             }
         });
 
@@ -101,6 +122,14 @@ public class MainActivityAdmin extends AppCompatActivity {
                     case R.id.userLicenses:
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new LicensesFragment()).commit();
+                        break;
+                    case R.id.userManagement:
+                        drawerLayout.closeDrawer(GravityCompat.START, false);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new UserManagement()).commit();
+                        break;
+                    case R.id.myAccount:
+                        drawerLayout.closeDrawer(GravityCompat.START, false);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyAccountFragment()).commit();
                         break;
                     case R.id.log_out:
                         drawerLayout.closeDrawer(GravityCompat.START, false);

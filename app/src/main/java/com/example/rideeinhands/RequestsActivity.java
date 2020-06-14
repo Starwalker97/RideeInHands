@@ -1,12 +1,16 @@
 package com.example.rideeinhands;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,19 +18,32 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rideeinhands.adminactivities.UserDetailsActivity;
 import com.example.rideeinhands.databinding.ActivityRequestsBinding;
 import com.example.rideeinhands.models.Request;
+import com.example.rideeinhands.models.Request;
 import com.example.rideeinhands.models.User;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import javax.annotation.Nullable;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -34,10 +51,23 @@ public class RequestsActivity extends AppCompatActivity {
 
     ActivityRequestsBinding binding;
     FirebaseFirestore firebaseFirestore;
-    FirebaseUser firebaseUser;
-    RequestsAdapter requestsAdapter;
-    ArrayList<Request> requests;
-    ArrayList<User> users;
+    FirebaseAuth firebaseAuth;
+    RecyclerView recyclerView;
+    FirestoreRecyclerAdapter<Request, RequestsActivity.RequestsViewHolder> firestoreRecyclerAdapter;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        firestoreRecyclerAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (firestoreRecyclerAdapter != null) {
+            firestoreRecyclerAdapter.stopListening();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,183 +75,158 @@ public class RequestsActivity extends AppCompatActivity {
         binding = ActivityRequestsBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        setSupportActionBar(binding.toolbar);
-        getSupportActionBar().setTitle("Requests");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        String docID = getIntent().getStringExtra("docID");
+        recyclerView = binding.recyclerView;
         firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        requests = new ArrayList<>();
-        users = new ArrayList<>();
-
-        firebaseFirestore.collection("Users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                                users.add(
-                                        new User(
-                                                documentSnapshot.getId(),
-                                                documentSnapshot.getString("Address"),
-                                                documentSnapshot.getString("DateOfBirth"),
-                                                documentSnapshot.getString("EmailAddress"),
-                                                documentSnapshot.getString("MobileNumber"),
-                                                documentSnapshot.getString("Name"),
-                                                documentSnapshot.getString("ProfilePicture")
-                                        )
-                                );
+        firebaseAuth = FirebaseAuth.getInstance();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(RequestsActivity.this);
+        recyclerView.setLayoutManager(layoutManager);
+        binding.btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RequestsActivity.this, TripActivity.class);
+                intent.putExtra("tripID", docID);
+                startActivity(intent);
+            }
+        });
+        Query query = firebaseFirestore.collection("Requests")
+                .whereEqualTo("To",FirebaseAuth.getInstance().getUid())
+                .whereEqualTo("TripID", docID);
+        FirestoreRecyclerOptions<Request> options = new FirestoreRecyclerOptions.Builder<Request>()
+                .setQuery(query, Request.class)
+                .build();
+        firestoreRecyclerAdapter = new FirestoreRecyclerAdapter<Request, RequestsActivity.RequestsViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull RequestsActivity.RequestsViewHolder RequestsViewHolder, int i, @NonNull Request request) {
+                firebaseFirestore.collection("Users")
+                        .document(request.getFrom())
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                RequestsViewHolder.setImage(documentSnapshot.getString("ProfilePicture"));
+                                RequestsViewHolder.setName(documentSnapshot.getString("Name"));
                             }
-                            firebaseFirestore.collection("Trips")
-                                    .document(firebaseUser.getUid())
-                                    .collection("Pending")
-                                    .document(TripDetailActivity.activeTrip.getTripId())
-                                    .collection("Requests")
-                                    .get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                                                    if (documentSnapshot.getString("Status").equals("Requested")) {
-                                                        requests.add(new Request(
-                                                                documentSnapshot.getId()
-                                                                , documentSnapshot.getString("Status")
-                                                                , documentSnapshot.getString("DateTime")
-                                                                , documentSnapshot.getString("PickUpPoint")
-                                                        ));
-                                                    }
-                                                    requestsAdapter.notifyDataSetChanged();
-                                                }
+                        });
+                RequestsViewHolder.setStatus(request.getStatus());
 
-                                            }
-                                        }
-                                    });
-                        }
+
+//                    RequestsViewHolder.itemView.setVisibility(View.GONE);
+//                    RequestsViewHolder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+
+            }
+            @NonNull
+            @Override
+            public RequestsActivity.RequestsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_request_view, parent, false);
+                view.findViewById(R.id.accept).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        firebaseFirestore.collection("Requests").document(getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId())
+                                .update("Status","Accepted");
+                        firebaseFirestore.collection("Trips").document(docID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                Integer passengers = documentSnapshot.getLong("Passengers").intValue();
+                                firebaseFirestore.collection("Requests").document(getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId())
+                                        .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                        Integer passenger2 = passengers - documentSnapshot.getLong("NoOfPassengers").intValue();
+                                        firebaseFirestore.collection("Trips").document(getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId())
+                                                .update("NoOfPassengers", passenger2);
+                                    }
+                                });
+
+                            }
+                        });
+
                     }
                 });
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        binding.recyclerView.setLayoutManager(layoutManager);
-        requestsAdapter = new RequestsAdapter(requests, users);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.recyclerView.getContext(),
+                view.findViewById(R.id.reject).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        firebaseFirestore.collection("Requests").document(getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId())
+                                .delete();
+                    }
+                });
+                return new RequestsActivity.RequestsViewHolder(view);
+            }
+        };
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
-        binding.recyclerView.addItemDecoration(dividerItemDecoration);
-        binding.recyclerView.setAdapter(requestsAdapter);
-        binding.recyclerView.setHasFixedSize(true);
-
+        recyclerView.addItemDecoration(dividerItemDecoration);
+        recyclerView.setAdapter(firestoreRecyclerAdapter);
+        firebaseFirestore.collection("Requests")
+                .whereEqualTo("To",FirebaseAuth.getInstance().getUid())
+                .whereEqualTo("TripID", docID).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                int i = 1;
+                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                    if (documentSnapshot.getString("Status").equals("Pending")){
+                        i = 0;
+                    }
+                }
+                if (i==1){
+                    findViewById(R.id.btn).setEnabled(true);
+                }
+            }
+        });
     }
-
-    public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.RequestsViewHolder> {
-
-        ArrayList<Request> requests;
-        ArrayList<User> users;
-
-        public RequestsAdapter(ArrayList<Request> dataset, ArrayList<User> userSet) {
-            requests = dataset;
-            users = userSet;
+    private class RequestsViewHolder extends RecyclerView.ViewHolder {
+        private View view;
+        public RequestsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            view = itemView;
         }
-
-        @NonNull
-        @Override
-        public RequestsAdapter.RequestsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.single_request_view, parent, false);
-
-            v.setOnClickListener(new View.OnClickListener() {
+        void setName(String name){
+            TextView textView = view.findViewById(R.id.userName);
+            textView.setText(name);
+        }
+        void setImage(String image) {
+           CircleImageView circleImageView = view.findViewById(R.id.userImage);
+            ProgressBar progressBar = view.findViewById(R.id.progress_circular2);
+            progressBar.setVisibility(View.VISIBLE);
+            Picasso.get().load(Uri.parse(image)).networkPolicy(NetworkPolicy.OFFLINE).into(circleImageView, new Callback() {
                 @Override
-                public void onClick(View v) {
-
+                public void onSuccess() {
+                    progressBar.setVisibility(View.GONE);
                 }
 
-
-            });
-
-            RequestsViewHolder vh = new RequestsViewHolder(v);
-            return vh;
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull RequestsViewHolder holder, int position) {
-            for (User user : users) {
-                if (user.getUserId().equals(requests.get(position).getUserId())) {
-                    holder.userName.setText(user.getName());
-                    Picasso.get().load(Uri.parse(user.getProfilePicture()))
-                            .placeholder(R.drawable.ic_account_circle_gray_24dp)
-                            .into(holder.userImage);
-                    holder.pickupPoint.setText(requests.get(position).getPickupPoint());
-                }
-            }
-
-            holder.accept.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    firebaseFirestore.collection("Trips")
-                            .document(firebaseUser.getUid())
-                            .collection("Pending")
-                            .document(TripDetailActivity.activeTrip.getTripId())
-                            .collection("Requests")
-                            .document(requests.get(position).getUserId())
-                            .update("Status", "Accepted")
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    holder.accept.setVisibility(View.GONE);
-                                    holder.reject.setVisibility(View.GONE);
-                                    holder.acceptText.setVisibility(View.VISIBLE);
-
-                                }
-                            });
+                public void onError(Exception e) {
+                    Picasso.get().load(Uri.parse(image)).into(circleImageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        @Override
+                        public void onError(Exception e) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(RequestsActivity.this, "Failed to load some images", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             });
-
-            holder.reject.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    firebaseFirestore.collection("Trips")
-                            .document(firebaseUser.getUid())
-                            .collection("Pending")
-                            .document(TripDetailActivity.activeTrip.getTripId())
-                            .collection("Requests")
-                            .document(requests.get(position).getUserId())
-                            .delete()
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    holder.accept.setVisibility(View.GONE);
-                                    holder.reject.setVisibility(View.GONE);
-                                    holder.acceptText.setVisibility(View.VISIBLE);
-                                    holder.acceptText.setText("Trip Request Deleted");
-                                }
-                            });
-                }
-
-            });
-
         }
 
-        @Override
-        public int getItemCount() {
-            return requests.size();
-        }
-
-        public class RequestsViewHolder extends RecyclerView.ViewHolder {
-            CircleImageView userImage;
-            TextView userName;
-            TextView pickupPoint;
-            TextView acceptText;
-            Button accept, reject;
-
-            public RequestsViewHolder(@NonNull View itemView) {
-                super(itemView);
-                userImage = itemView.findViewById(R.id.userImage);
-                userName = itemView.findViewById(R.id.userName);
-                pickupPoint = itemView.findViewById(R.id.pickupPoint);
-                accept = itemView.findViewById(R.id.accept);
-                reject = itemView.findViewById(R.id.reject);
-                acceptText = itemView.findViewById(R.id.acceptText);
+        void setStatus(String status) {
+            TextView textView = view.findViewById(R.id.acceptText);
+            if (status.equals("Accepted")){
+                textView.setVisibility(View.VISIBLE);
+                view.findViewById(R.id.accept).setVisibility(View.GONE);
+                view.findViewById(R.id.reject).setVisibility(View.GONE);
+            } else if (status.equals("Pending")) {
+                textView.setVisibility(View.GONE);
+                view.findViewById(R.id.accept).setVisibility(View.VISIBLE);
+                view.findViewById(R.id.reject).setVisibility(View.VISIBLE);
+            } else if (status.equals("Arrived")){
+                textView.setText("This passenger has arrived to his destination");
             }
         }
+
+
     }
 
 

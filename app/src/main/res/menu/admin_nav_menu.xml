@@ -4,6 +4,14 @@
         android:title="User Licenses"
         android:icon="@drawable/license_icon"
         />
+    <item android:id="@+id/userManagement"
+        android:title="Manage Users"
+        android:icon="@drawable/ic_supervisor_account_black_24dp"
+        />
+    <item android:id="@+id/myAccount"
+        android:title="My Account"
+        android:icon="@drawable/ic_account_box_black_24dp"
+        />
     <item android:id="@+id/log_out"
         android:title="Log Out"
         android:icon="@drawable/exit"/>

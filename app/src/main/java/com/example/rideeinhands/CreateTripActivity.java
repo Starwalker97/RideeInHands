@@ -16,12 +16,16 @@ import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClic
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 public class CreateTripActivity extends AppCompatActivity {
 
-    MaterialEditText tripName, tripDetail, tripDate, tripTime, no_of_passengers;
+    MaterialEditText tripName, tripDetail, tripTime, no_of_passengers;
     Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,24 +37,10 @@ public class CreateTripActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Create Trip");
 
         tripName = findViewById(R.id.tripName);
-        tripDate = findViewById(R.id.tripDate);
         tripDetail = findViewById(R.id.tripDetails);
         tripTime = findViewById(R.id.tripTime);
         no_of_passengers = findViewById(R.id.no_of_passengers);
 
-        tripDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus)
-                    setDate();
-            }
-        });
-        tripDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                    setDate();
-            }
-        });
 
         tripTime.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -69,16 +59,25 @@ public class CreateTripActivity extends AppCompatActivity {
         findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if ((!tripTime.getText().toString().isEmpty()) && (!tripDetail.getText().toString().isEmpty())
-                        && (!tripDate.getText().toString().isEmpty()) && (!tripName.getText().toString().isEmpty())
+                        && (!tripName.getText().toString().isEmpty())
                         && (!no_of_passengers.getText().toString().isEmpty())) {
+                    Date todayWithZeroTime = new Date();
+                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-                    Intent intent = new Intent(CreateTripActivity.this, SelectLocation.class);
+                    Date today = new Date();
+
+                    try {
+                       todayWithZeroTime = formatter.parse(formatter.format(today));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    Intent intent = new Intent(CreateTripActivity.this, SelectVehicleActivity.class);
                     intent.putExtra("whichActivity", "CreateTrip");
                     intent.putExtra("tripName", tripName.getText().toString());
                     intent.putExtra("tripDetail", tripDetail.getText().toString());
-                    intent.putExtra("tripDate", tripDate.getText().toString());
+                    intent.putExtra("tripDate", todayWithZeroTime.toString());
                     intent.putExtra("tripTime", tripTime.getText().toString());
                     intent.putExtra("no_of_passengers", no_of_passengers.getText().toString());
                     startActivity(intent);
@@ -89,33 +88,6 @@ public class CreateTripActivity extends AppCompatActivity {
         });
 
 
-
-    }
-
-
-    private void setDate(){
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.clear();
-
-        long today = MaterialDatePicker.todayInUtcMilliseconds();
-
-        CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-        constraintsBuilder.setValidator(DateValidatorPointForward.now());
-
-        MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.datePicker();
-        builder.setTitleText("Select the trip date");
-        builder.setSelection(today);
-        builder.setCalendarConstraints(constraintsBuilder.build());
-        final MaterialDatePicker materialDatePicker = builder.build();
-        materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER");
-
-
-        materialDatePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
-            @Override
-            public void onPositiveButtonClick(Object selection) {
-                tripDate.setText(materialDatePicker.getHeaderText());
-            }
-        });
 
     }
 

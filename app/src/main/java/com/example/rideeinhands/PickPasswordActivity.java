@@ -65,6 +65,8 @@ public class PickPasswordActivity extends AppCompatActivity {
         object.put("MobileNumber",number);
         object.put("EmailAddress",email);
         object.put("Role", "user");
+        final Map<String,Object> map = new HashMap<>();
+        map.put("TotalAmount",0);
         findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,21 +88,29 @@ public class PickPasswordActivity extends AppCompatActivity {
                                                         public void onSuccess(Uri uri) {
                                                             downloadUri = uri.toString();
                                                             object.put("ProfilePicture", downloadUri);
-                                                            db.collection("Users")
+                                                            db.collection("Wallets")
                                                                     .document(mAuth.getCurrentUser().getUid())
-                                                                    .set(object)
-                                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                        @Override
-                                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                                            sendEmailVerification();
-                                                                        }
-                                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                                    .set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                 @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    progressDialog.dismiss();
-                                                                    Toast.makeText(PickPasswordActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                public void onSuccess(Void aVoid) {
+                                                                    db.collection("Users")
+                                                                            .document(mAuth.getCurrentUser().getUid())
+                                                                            .set(object)
+                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                    sendEmailVerification();
+                                                                                }
+                                                                            }).addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            progressDialog.dismiss();
+                                                                            Toast.makeText(PickPasswordActivity.this,e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
                                                                 }
                                                             });
+
                                                         }
                                                     });
 

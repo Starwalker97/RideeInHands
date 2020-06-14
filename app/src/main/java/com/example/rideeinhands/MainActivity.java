@@ -21,6 +21,7 @@ import com.example.rideeinhands.fragments.MyAccountFragment;
 import com.example.rideeinhands.fragments.MyLicenseFragment;
 import com.example.rideeinhands.fragments.MyTripsFragment;
 import com.example.rideeinhands.fragments.MyVehiclesFragment;
+import com.example.rideeinhands.fragments.MyWalletFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -80,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                username = documentSnapshot.getString("Name");
                profilePicture = documentSnapshot.getString("ProfilePicture");
-
                TextView textView = navigationView.getHeaderView(0).findViewById(R.id.username);
                textView.setText(username);
                CircleImageView circleImageView = navigationView.getHeaderView(0).findViewById(R.id.img);
@@ -89,31 +89,41 @@ public class MainActivity extends AppCompatActivity {
            }
        });
 
+       getSupportActionBar().setTitle("Home");
         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MainFragment()).commit();
-
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.home:
+                        getSupportActionBar().setTitle("Home");
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MainFragment()).commit();
                         break;
                     case R.id.myAccount:
+                        getSupportActionBar().setTitle("My Account");
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyAccountFragment()).commit();
                         break;
                     case R.id.myVehicles:
+                        getSupportActionBar().setTitle("My Vehicles");
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyVehiclesFragment()).commit();
                         break;
                     case R.id.myLicenses:
+                        getSupportActionBar().setTitle("My License");
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyLicenseFragment()).commit();
                         break;
                     case R.id.activeTrips:
+                        getSupportActionBar().setTitle("Active Trips");
                         drawerLayout.closeDrawer(GravityCompat.START, false);
                         getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyTripsFragment()).commit();
+                        break;
+                    case R.id.wallet:
+                        getSupportActionBar().setTitle("My Wallet");
+                        drawerLayout.closeDrawer(GravityCompat.START, false);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, new MyWalletFragment()).commit();
                         break;
                     case R.id.log_out:
                         drawerLayout.closeDrawer(GravityCompat.START, false);

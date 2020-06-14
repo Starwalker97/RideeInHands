@@ -173,7 +173,6 @@ public class MainFragment extends Fragment {
 
                 }
 
-
                 mMap.setOnMyLocationClickListener(new GoogleMap.OnMyLocationClickListener() {
                     @Override
                     public void onMyLocationClick(@NonNull Location location) {
@@ -196,7 +195,6 @@ public class MainFragment extends Fragment {
                     public void onSuccess(Location location) {
                         if (location != null) {
                             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
-
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
                                     .zoom(17)                   // Sets the zoom
