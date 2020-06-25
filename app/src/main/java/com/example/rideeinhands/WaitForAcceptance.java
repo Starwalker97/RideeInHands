@@ -1,9 +1,11 @@
 package com.example.rideeinhands;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,6 +23,9 @@ import javax.annotation.Nullable;
 public class WaitForAcceptance extends AppCompatActivity {
     ActivityWaitForAcceptanceBinding binding;
     CollectionReference collectionReference;
+    boolean cancelRequest = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +37,8 @@ public class WaitForAcceptance extends AppCompatActivity {
         binding.cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                collectionReference.document(getIntent().getStringExtra("requestID")).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        onBackPressed();
-                    }
-                });
+                cancelRequest = true;
+                collectionReference.document(getIntent().getStringExtra("requestID")).delete();
             }
         });
         collectionReference.document(getIntent().getStringExtra("requestID")).addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -49,9 +50,8 @@ public class WaitForAcceptance extends AppCompatActivity {
                     intent.putExtra("requestID", documentSnapshot.getId());
                     startActivity(intent);
                 } else if (!documentSnapshot.exists()){
-                    Toast.makeText(WaitForAcceptance.this, "Your trip request has been rejected", Toast.LENGTH_SHORT).show();
-                    onBackPressed();
-                }
+                    Toast.makeText(WaitForAcceptance.this, "Your trip request has been rejected", Toast.LENGTH_SHORT).show(); }
+                    //finish();
             }
         });
 

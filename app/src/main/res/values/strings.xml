@@ -12,6 +12,7 @@
     <string name="gps_network_not_enabled">Please enable your GPS/Location</string>
     <string name="open_location_settings">Open Location Settings</string>
     <string name="Cancel">Cancel</string>
+    <string name="default_notification_channel_id">RideInHand</string>
     <string-array name="type">
         <item>Car</item>
         <item>Motorcycle</item>

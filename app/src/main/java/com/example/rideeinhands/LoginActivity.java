@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 public class LoginActivity extends AppCompatActivity {
@@ -67,6 +68,8 @@ public class LoginActivity extends AppCompatActivity {
                                                         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                FirebaseFirestore.getInstance().collection("Users").document(firebaseAuth.getUid())
+                                                                        .update("DeviceToken", FirebaseInstanceId.getInstance().getToken());
                                                                 if (task.getResult().get("Role").equals("user")){
                                                                     Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                                                                     LoginActivity.this.startActivity(mainIntent);

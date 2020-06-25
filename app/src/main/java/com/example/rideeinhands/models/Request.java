@@ -3,23 +3,26 @@ package com.example.rideeinhands.models;
 public class Request {
 
     String From;
-    Integer Passengers;
+    Long Passengers;
     String Status;
     String Time;
     String To;
     String TripID;
+    Long Price;
 
     public Request() {
     }
 
-    public Request(String from, Integer passengers, String status, String time, String to, String tripID) {
+    public Request(String from, Long passengers, String status, String time, String to, String tripID, Long price) {
         From = from;
         Passengers = passengers;
         Status = status;
         Time = time;
         To = to;
         TripID = tripID;
+        Price = price;
     }
+
 
     public String getFrom() {
         return From;
@@ -29,11 +32,11 @@ public class Request {
         From = from;
     }
 
-    public Integer getPassengers() {
+    public Long getPassengers() {
         return Passengers;
     }
 
-    public void setPassengers(Integer passengers) {
+    public void setPassengers(Long passengers) {
         Passengers = passengers;
     }
 
@@ -67,5 +70,13 @@ public class Request {
 
     public void setTripID(String tripID) {
         TripID = tripID;
+    }
+
+    public Long getPrice() {
+        return Price;
+    }
+
+    public void setPrice(Long price) {
+        Price = price;
     }
 }

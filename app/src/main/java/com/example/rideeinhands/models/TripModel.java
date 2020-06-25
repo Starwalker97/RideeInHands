@@ -13,12 +13,13 @@ public class TripModel {
     String Route;
     String RideHolder;
     String TripID;
-    Integer NumberOfPassengers;
+    String Status;
+    Long NumberOfPassengers;
 
     public TripModel() {
     }
 
-    public TripModel(String name, String detail, String start, String destination, String startLocation, String destinationLocation, String date, String time, String route, String rideHolder, String tripID, Integer numberOfPassengers) {
+    public TripModel(String name, String detail, String start, String destination, String startLocation, String destinationLocation, String date, String time, String route, String rideHolder, String tripID, String status, Long numberOfPassengers) {
         Name = name;
         Detail = detail;
         Start = start;
@@ -30,6 +31,7 @@ public class TripModel {
         Route = route;
         RideHolder = rideHolder;
         TripID = tripID;
+        Status = status;
         NumberOfPassengers = numberOfPassengers;
     }
 
@@ -113,19 +115,27 @@ public class TripModel {
         RideHolder = rideHolder;
     }
 
-    public String getTripId() {
+    public String getTripID() {
         return TripID;
     }
 
-    public void setTripId(String tripID) {
+    public void setTripID(String tripID) {
         TripID = tripID;
     }
 
-    public Integer getNumberOfPassengers() {
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
+    }
+
+    public Long getNumberOfPassengers() {
         return NumberOfPassengers;
     }
 
-    public void setNumberOfPassengers(Integer numberOfPassengers) {
+    public void setNumberOfPassengers(Long numberOfPassengers) {
         NumberOfPassengers = numberOfPassengers;
     }
 }

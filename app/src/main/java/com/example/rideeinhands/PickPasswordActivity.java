@@ -66,7 +66,7 @@ public class PickPasswordActivity extends AppCompatActivity {
         object.put("EmailAddress",email);
         object.put("Role", "user");
         final Map<String,Object> map = new HashMap<>();
-        map.put("TotalAmount",0);
+        map.put("Total",0);
         findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

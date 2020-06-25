@@ -76,6 +76,7 @@ public class RequestsActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
         String docID = getIntent().getStringExtra("docID");
+        Toast.makeText(this, docID, Toast.LENGTH_SHORT).show();
         recyclerView = binding.recyclerView;
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -84,15 +85,23 @@ public class RequestsActivity extends AppCompatActivity {
         binding.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(RequestsActivity.this, TripActivity.class);
-                intent.putExtra("tripID", docID);
-                startActivity(intent);
+                firebaseFirestore.collection("Trips").document(docID).update("Status","Started").addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Intent intent = new Intent(RequestsActivity.this, TripActivity.class);
+                        intent.putExtra("tripID", docID);
+                        startActivity(intent);
+                    }
+                });
+
             }
         });
         Query query = firebaseFirestore.collection("Requests")
                 .whereEqualTo("To",FirebaseAuth.getInstance().getUid())
                 .whereEqualTo("TripID", docID);
+        Toast.makeText(this, docID, Toast.LENGTH_SHORT).show();
         FirestoreRecyclerOptions<Request> options = new FirestoreRecyclerOptions.Builder<Request>()
+                .setLifecycleOwner(RequestsActivity.this)
                 .setQuery(query, Request.class)
                 .build();
         firestoreRecyclerAdapter = new FirestoreRecyclerAdapter<Request, RequestsActivity.RequestsViewHolder>(options) {
@@ -122,18 +131,18 @@ public class RequestsActivity extends AppCompatActivity {
                 view.findViewById(R.id.accept).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        firebaseFirestore.collection("Requests").document(getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId())
-                                .update("Status","Accepted");
+                        String id = getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId();
+                        firebaseFirestore.collection("Requests").document(id).update("Status","Accepted");
                         firebaseFirestore.collection("Trips").document(docID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                Integer passengers = documentSnapshot.getLong("Passengers").intValue();
-                                firebaseFirestore.collection("Requests").document(getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId())
+                                Long passengers = documentSnapshot.getLong("NumberOfPassengers");
+                                firebaseFirestore.collection("Requests").document(id)
                                         .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                     @Override
                                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                        Integer passenger2 = passengers - documentSnapshot.getLong("NoOfPassengers").intValue();
-                                        firebaseFirestore.collection("Trips").document(getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId())
+                                        Long passenger2 = passengers - documentSnapshot.getLong("Passengers");
+                                        firebaseFirestore.collection("Trips").document(id)
                                                 .update("NoOfPassengers", passenger2);
                                     }
                                 });
@@ -148,6 +157,21 @@ public class RequestsActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         firebaseFirestore.collection("Requests").document(getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId())
                                 .delete();
+                    }
+                });
+                view.findViewById(R.id.message).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        firebaseFirestore.collection("Requests").document(getSnapshots().getSnapshot(recyclerView.getChildLayoutPosition(view)).getId())
+                                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                Intent intent = new Intent(RequestsActivity.this, ChatActivity.class);
+                                intent.putExtra("With",documentSnapshot.getString("From"));
+                                startActivity(intent);
+                            }
+                        });
+
                     }
                 });
                 return new RequestsActivity.RequestsViewHolder(view);
@@ -214,11 +238,11 @@ public class RequestsActivity extends AppCompatActivity {
         void setStatus(String status) {
             TextView textView = view.findViewById(R.id.acceptText);
             if (status.equals("Accepted")){
-                textView.setVisibility(View.VISIBLE);
+                view.findViewById(R.id.message).setVisibility(View.VISIBLE);
                 view.findViewById(R.id.accept).setVisibility(View.GONE);
                 view.findViewById(R.id.reject).setVisibility(View.GONE);
             } else if (status.equals("Pending")) {
-                textView.setVisibility(View.GONE);
+                view.findViewById(R.id.message).setVisibility(View.GONE);
                 view.findViewById(R.id.accept).setVisibility(View.VISIBLE);
                 view.findViewById(R.id.reject).setVisibility(View.VISIBLE);
             } else if (status.equals("Arrived")){

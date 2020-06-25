@@ -13,11 +13,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,20 +37,24 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nullable;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HeadTowardsActivity extends AppCompatActivity {
     private static boolean gps_enabled;
     private static boolean network_enabled;
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
-
+    private String to;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_head_towards);
+
         if (ContextCompat.checkSelfPermission(HeadTowardsActivity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -68,7 +74,7 @@ public class HeadTowardsActivity extends AppCompatActivity {
                             Button button = findViewById(R.id.cancel_button);
                             button.setTextColor(getColor(R.color.colorPrimary));
                             button.setText("I've reached my destination");
-                        } else if (documentSnapshot.exists()&& documentSnapshot.getString("Status").equals("Completed")) {
+                        } else if (documentSnapshot.exists() && documentSnapshot.getString("Status").equals("Completed")) {
                             TextView textView = findViewById(R.id.status);
                             textView.setText("The trip has been completed");
                             Button button = findViewById(R.id.cancel_button);
@@ -77,6 +83,41 @@ public class HeadTowardsActivity extends AppCompatActivity {
                         }
                     }
                 });
+        FirebaseFirestore.getInstance().collection("Requests").document(getIntent().getStringExtra("requestID"))
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                FirebaseFirestore.getInstance().collection("Users").document(documentSnapshot.getString("To"))
+                        .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        TextView textView = findViewById(R.id.name);
+                        textView.setText(documentSnapshot.getString("Name"));
+                        CircleImageView imageView = findViewById(R.id.image);
+                        Picasso.get().load(Uri.parse(documentSnapshot.getString("ProfilePicture"))).into(imageView);
+                    }
+                });
+            }
+        });
+
+
+        FirebaseFirestore.getInstance().collection("Requests").document(getIntent().getStringExtra("requestID"))
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                to = documentSnapshot.getString("To");
+            }
+        });
+
+        ImageView imageView = findViewById(R.id.chat_icon);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HeadTowardsActivity.this, ChatActivity.class);
+                intent.putExtra("With", to);
+                startActivity(intent);
+            }
+        });
         Button button = findViewById(R.id.cancel_button);
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -91,18 +132,54 @@ public class HeadTowardsActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
                     });
-                }
-                else if (button.getText().toString().equals("I've reached my destination")) {
+                } else if (button.getText().toString().equals("I've reached my destination")) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(HeadTowardsActivity.this)
                             .setTitle("Confirmation")
                             .setMessage("Are you sure you have reached your destination?")
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                   Intent intent = new Intent(HeadTowardsActivity.this, MainActivity.class);
-                                   startActivity(intent);
+                                    FirebaseFirestore.getInstance().collection("Requests").document(getIntent().getStringExtra("requestID"))
+                                            .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                            FirebaseFirestore.getInstance().collection("Wallets").document(documentSnapshot.getString("From"))
+                                                    .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onSuccess(DocumentSnapshot documentSnapshot1) {
+                                                    Long price = documentSnapshot.getLong("Price");
+                                                    Long l = documentSnapshot1.getLong("Total");
+                                                    Long payment = l - documentSnapshot.getLong("Price");
+                                                    FirebaseFirestore.getInstance().collection("Wallets").document(documentSnapshot.getString("From"))
+                                                            .update("Total", payment).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            FirebaseFirestore.getInstance().collection("Wallets").document(documentSnapshot.getString("To"))
+                                                                    .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                                @Override
+                                                                public void onSuccess(DocumentSnapshot documentSnapshot2) {
+                                                                    Long l = documentSnapshot2.getLong("Total");
+                                                                    Long payment = l + documentSnapshot.getLong("Price");
+                                                                    FirebaseFirestore.getInstance().collection("Wallets").document(documentSnapshot.getString("To"))
+                                                                            .update("Total", payment).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            Intent intent = new Intent(HeadTowardsActivity.this, MainActivity.class);
+                                                                            startActivity(intent);
+                                                                            finish();
+                                                                        }
+                                                                    });
+
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
-                            }). setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
 
@@ -131,6 +208,16 @@ public class HeadTowardsActivity extends AppCompatActivity {
 //            } catch (Resources.NotFoundException e) {
 //            }
 
+                if (ActivityCompat.checkSelfPermission(HeadTowardsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(HeadTowardsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
                 mMap.setMyLocationEnabled(true);
 
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -232,6 +319,16 @@ public class HeadTowardsActivity extends AppCompatActivity {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
+                if (ActivityCompat.checkSelfPermission(HeadTowardsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(HeadTowardsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
                 fusedLocationProviderClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {

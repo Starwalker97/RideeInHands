@@ -80,4 +80,21 @@
         app:strokeColor="@color/reject_red"
         app:strokeWidth="2dp" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/message"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="225dp"
+        android:layout_height="wrap_content"
+        android:text="Send Message"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@+id/userName"
+        app:layout_constraintHorizontal_bias="0.7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:rippleColor="@color/colorPrimary"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="2dp" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

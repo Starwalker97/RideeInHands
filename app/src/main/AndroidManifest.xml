@@ -15,24 +15,40 @@
         android:roundIcon="@drawable/app_logo_circle"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TripActivity"></activity>
-        <activity android:name=".HeadTowardsActivity" />
-        <activity android:name=".WaitForAcceptance" />
-        <activity android:name=".SelectVehicleActivity" />
-        <activity android:name=".adminactivities.UserDetailsActivity" />
-        <activity android:name=".adminactivities.MainActivityAdmin" />
-        <activity android:name=".AddVehicleActivity" />
+        <activity android:name=".adminactivities.PhotoActivity"></activity>
+        <activity android:name=".ChatActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".TripActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".HeadTowardsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".WaitForAcceptance"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SelectVehicleActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".adminactivities.UserDetailsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".adminactivities.MainActivityAdmin"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".AddVehicleActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".RequestsActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".TripDetailActivity" />
-        <activity android:name=".AvailableTrips" />
-        <activity android:name=".GetARideActivity" />
+        <activity android:name=".AvailableTrips"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".GetARideActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".TripDetailActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".SelectLocation" />
+        <activity android:name=".SelectLocation"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".CreateTripActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
 
         <meta-data
@@ -41,7 +57,8 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps" />
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -49,21 +66,42 @@
 
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat" />
-        <activity android:name=".ForgotPasswordActivity" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".PickPasswordActivity" />
-        <activity android:name=".PictureActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".SplashScreenActivity">
+            android:theme="@style/Base.Theme.AppCompat"
+            />
+        <activity android:name=".ForgotPasswordActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".PickPasswordActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".PictureActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".RegisterActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SignUpActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SplashScreenActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".FirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
     </application>
 
 </manifest>

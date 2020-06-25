@@ -62,7 +62,8 @@ public class MyTripsFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        Query query = firebaseFirestore.collection("Trips").whereEqualTo("RideHolder",FirebaseAuth.getInstance().getUid());
+        Query query = firebaseFirestore.collection("Trips").whereEqualTo("RideHolder",FirebaseAuth.getInstance().getUid())
+                .whereEqualTo("Status","pending");
         FirestoreRecyclerOptions<TripModel> options = new FirestoreRecyclerOptions.Builder<TripModel>()
                 .setQuery(query, TripModel.class)
                 .build();
@@ -74,7 +75,7 @@ public class MyTripsFragment extends Fragment {
                 tripsViewHolder.setDate(tripModel.getDate());
                 tripsViewHolder.setDestination(tripModel.getDestination());
 
-                tripModel.setTripId(getSnapshots().getSnapshot(i).getId());
+                tripModel.setTripID(getSnapshots().getSnapshot(i).getId());
                 activetripsList.add(tripModel);
 
             }
@@ -89,6 +90,7 @@ public class MyTripsFragment extends Fragment {
                         Intent intent = new Intent(getContext(), TripDetailActivity.class);
                         int itemPosition = recyclerView.getChildLayoutPosition(view);
                         intent.putExtra("position", itemPosition);
+                        intent.putExtra("docID", firestoreRecyclerAdapter.getSnapshots().getSnapshot(itemPosition).getId());
                         intent.putExtra("whichActivity", "MyTripsFragment");
                         startActivity(intent);
                     }

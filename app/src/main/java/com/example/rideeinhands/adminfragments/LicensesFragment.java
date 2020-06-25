@@ -22,19 +22,23 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.rideeinhands.MainActivity;
 import com.example.rideeinhands.R;
 import com.example.rideeinhands.TripDetailActivity;
+import com.example.rideeinhands.adminactivities.PhotoActivity;
 import com.example.rideeinhands.databinding.FragmentLicensesBinding;
 import com.example.rideeinhands.adminmodels.License;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.squareup.picasso.Callback;
@@ -182,6 +186,16 @@ public class LicensesFragment extends Fragment {
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case 120:
+                DocumentReference documentReference2 = FirebaseFirestore.getInstance().collection("License")
+                        .document(firestoreRecyclerAdapter.getSnapshots().getSnapshot(item.getGroupId()).getId());
+                documentReference2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        Intent intent = new Intent(getActivity(), PhotoActivity.class);
+                        intent.putExtra("photolink",documentSnapshot.getString("Picture"));
+                        startActivity(intent);
+                    }
+                });
 
                 break;
             case 121:

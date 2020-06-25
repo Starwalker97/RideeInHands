@@ -3,9 +3,12 @@ package com.example.rideeinhands;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -64,13 +67,14 @@ public class TripActivity extends AppCompatActivity {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                firebaseFirestore.collection("Trips").document(getIntent().getStringExtra("tripID")).update("Status","Completed")
+                                firebaseFirestore.collection("Trips").document(getIntent().getStringExtra("tripID")).update("Status", "Completed")
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 Toast.makeText(TripActivity.this, "Trip Completed", Toast.LENGTH_SHORT).show();
                                                 Intent intent = new Intent(TripActivity.this, MainActivity.class);
                                                 startActivity(intent);
+                                                finish();
                                             }
                                         });
                             }
@@ -98,6 +102,16 @@ public class TripActivity extends AppCompatActivity {
                     public void onMapReady(GoogleMap googleMap) {
                         mMap = googleMap;
 
+                        if (ActivityCompat.checkSelfPermission(TripActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(TripActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return;
+                        }
                         mMap.setMyLocationEnabled(true);
 
                         mMap.getUiSettings().setMyLocationButtonEnabled(false);

@@ -87,7 +87,7 @@ public class AvailableTrips extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         Query query = firebaseFirestore.collection("Trips")
                 .whereEqualTo("DestinationLocation",destinationLatLng.latitude+","+destinationLatLng.longitude)
-                .whereGreaterThanOrEqualTo("NumberOfPassengers", Integer.parseInt(no_of_passengers))
+                .whereGreaterThanOrEqualTo("NumberOfPassengers", Long.parseLong(no_of_passengers))
                 .whereEqualTo("Status","pending");
         FirestoreRecyclerOptions<TripModel> options = new FirestoreRecyclerOptions.Builder<TripModel>()
                 .setQuery(query, TripModel.class)
@@ -100,7 +100,7 @@ public class AvailableTrips extends AppCompatActivity {
                     TripsViewHolder.setDate(Trip.getDate());
                     TripsViewHolder.setName(Trip.getName());
                     TripsViewHolder.setDestination(Trip.getDestination());
-                    Trip.setTripId(getSnapshots().getSnapshot(i).getId());
+                    Trip.setTripID(getSnapshots().getSnapshot(i).getId());
                     tripsList.add(Trip);
                 } else {
                     TripsViewHolder.itemView.setVisibility(View.GONE);

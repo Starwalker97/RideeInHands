@@ -143,7 +143,7 @@ public class SelectLocation extends AppCompatActivity {
                     hashMap.put("Time", tripTime);
                     hashMap.put("Vehicle", vehicle);
                     hashMap.put("RideHolder", FirebaseAuth.getInstance().getUid());
-                    hashMap.put("NumberOfPassengers", Integer.parseInt(no_of_passengers));
+                    hashMap.put("NumberOfPassengers", Long.parseLong(no_of_passengers));
                     hashMap.put("Start", startingPoint.getText().toString());
                     hashMap.put("Destination", destinationPoint.getText().toString());
                     hashMap.put("StartLocation", startingPointLoc.latitude + "," + startingPointLoc.longitude);
