@@ -65,6 +65,7 @@ public class PickPasswordActivity extends AppCompatActivity {
         object.put("MobileNumber",number);
         object.put("EmailAddress",email);
         object.put("Role", "user");
+        object.put("Disabled","false");
         final Map<String,Object> map = new HashMap<>();
         map.put("Total",0);
         findViewById(R.id.submit).setOnClickListener(new View.OnClickListener() {
