@@ -17,7 +17,7 @@ This is a **Ride Sharing Application** that helps users to interact with eachoth
   <img src="https://github.com/Starwalker97/RideeInHands/blob/master/app/sampledata/1.png" width="200">
   <img src="https://github.com/Starwalker97/RideeInHands/blob/master/app/sampledata/2.png" width="200">
   <img src="https://github.com/Starwalker97/RideeInHands/blob/master/app/sampledata/3.png" width="200">
-  <img src="https://github.com/Starwalker97/RideeInHands/blob/master/app/sampledata/4.png" width="200">
+  <img src="https://github.com/Starwalker97/RideeInHands/blob/master/app/sampledata/13.png" width="200">
 
 </p>
 <p align="center">
