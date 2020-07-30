@@ -118,6 +118,7 @@ public class AvailableTrips extends AppCompatActivity {
                         intent.putExtra("whichActivity","AvailableTrips");
                         intent.putExtra("passengers",no_of_passengers);
                         intent.putExtra("position",recyclerView.getChildLayoutPosition(v));
+
                         startActivity(intent);
                     }
                 });

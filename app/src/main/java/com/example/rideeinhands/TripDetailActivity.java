@@ -278,6 +278,7 @@ public class TripDetailActivity extends AppCompatActivity {
                     DirectionsJSONParser parser = new DirectionsJSONParser();
                     routes = null;
                     routes = parser.parse(jObject);
+                    Log.d("TAG",routes.toString());
 
                 } catch (Exception e) {
                     e.printStackTrace();
