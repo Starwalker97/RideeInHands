@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.firebase:firebase-auth:17.0.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/93e3e36ae2e2b51d19fa0a5740a8d6fe/jetified-firebase-auth-17.0.0/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/93e3e36ae2e2b51d19fa0a5740a8d6fe/jetified-firebase-auth-17.0.0/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3329d6ddfa90349803fd2c3afb0b2963/jetified-firebase-auth-17.0.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3329d6ddfa90349803fd2c3afb0b2963/jetified-firebase-auth-17.0.0/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.firebase/firebase-auth/17.0.0/c631d65f92cee79b48067fcbe683d8912140ac1b/firebase-auth-17.0.0-javadoc.jar!/" />
