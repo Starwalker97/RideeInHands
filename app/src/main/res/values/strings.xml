@@ -7,7 +7,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="google_maps_key">AIzaSyDvoqNKtNFkdHnEDXIZ0IIv-ETrpLQsJmU</string>
+    <string name="google_maps_key"></string>
     <string name="title_activity_maps">Map</string>
     <string name="gps_network_not_enabled">Please enable your GPS/Location</string>
     <string name="open_location_settings">Open Location Settings</string>
